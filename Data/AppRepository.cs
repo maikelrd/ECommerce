@@ -144,5 +144,27 @@ namespace ECommerce.Data
 
             return await query.FirstOrDefaultAsync();
         }
+
+        //Users
+        public async Task<User[]> GetAllUserAsync()
+        {
+            _logger.LogInformation($"Getting all Users");
+            IQueryable<User> query = _context.Users.OrderByDescending(u => u.UserName);
+            return await query.ToArrayAsync();
+        }
+
+        public async Task<User> GetUserByIdAsync(int id)
+        {
+            _logger.LogInformation($"Getting a User for {id}");
+            IQueryable<User> query = _context.Users.Where(u => u.UserId == id);
+            return await query.FirstOrDefaultAsync();
+        }
+
+        public async Task<User> GetUserByNameAsync(string name)
+        {
+            _logger.LogInformation($"Getting a User for {name}");
+            IQueryable<User> query = _context.Users.Where(u => u.UserName == name);
+            return await query.FirstOrDefaultAsync();
+        }
     }
 }

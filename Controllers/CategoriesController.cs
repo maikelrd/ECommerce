@@ -75,6 +75,10 @@ namespace ECommerce.Controllers
                 {
                     var location = _linkGenerator.GetPathByAction("Get", "Categories",
                                                                   new { id = category.CategoryId });
+                    if (string.IsNullOrWhiteSpace(location))
+                    {
+                        return BadRequest("Could not use current CategoryId");
+                    }
                     return Created(location, _mapper.Map<CategoryModel>(category));
                 }
             }

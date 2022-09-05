@@ -80,7 +80,7 @@ namespace ECommerce.Controllers
                                                                new { id = product.ProductId });
                     if (string.IsNullOrWhiteSpace(location))
                     {
-                        return BadRequest("Could not use current Id");
+                        return BadRequest("Could not use current ProductId");
                     }
                     return Created(location, _mapper.Map<ProductModel>(product));
                 }

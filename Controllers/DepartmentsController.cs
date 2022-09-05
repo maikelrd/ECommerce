@@ -77,6 +77,10 @@ namespace ECommerce.Controllers
                 {
                     var location = _linkGenerator.GetPathByAction("Get", "Departments",
                                                                  new { id = department.DepartmentId });
+                    if (string.IsNullOrWhiteSpace(location))
+                    {
+                        return BadRequest("Could not use current DepartmentId");
+                    }
                     return Created(location, _mapper.Map<DepartmentModel>(department));
                 }
             }

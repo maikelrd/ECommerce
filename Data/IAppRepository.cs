@@ -8,6 +8,7 @@ namespace ECommerce.Data
         //General
         void Add<T>(T entity) where T : class;
         void Delete<T>(T entity) where T : class;
+        Task<bool> SaveChangesAsync();
 
         //Category
         Task<Category[]> GetAllCategoriesAsync(bool includeProducts = false);
@@ -24,6 +25,10 @@ namespace ECommerce.Data
         //Product
         Task<Product> GetProductById(int id);
         Task<Product> GetProductByName(string name);
-        Task<bool> SaveChangesAsync();
+
+        //User
+        Task<User[]> GetAllUserAsync();
+        Task<User> GetUserByIdAsync(int id);
+        Task<User> GetUserByNameAsync(string name);
     }
 }
