@@ -166,5 +166,12 @@ namespace ECommerce.Data
             IQueryable<User> query = _context.Users.Where(u => u.UserName == name);
             return await query.FirstOrDefaultAsync();
         }
+
+        public async Task<User> GetUserByEmailAsync(string email)
+        {
+            _logger.LogInformation($"Getting a User for {email}");
+            IQueryable<User> query = _context.Users.Where(u => u.Email == email);
+            return await query.FirstOrDefaultAsync();
+        }
     }
 }

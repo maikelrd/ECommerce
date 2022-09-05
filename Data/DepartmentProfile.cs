@@ -16,6 +16,9 @@ namespace ECommerce.Data
             CreateMap<Category, CategoryModel>().ReverseMap();
             CreateMap<Product, ProductModel>().ReverseMap();
             CreateMap<User, UserModel>().ReverseMap();
+
+            //revisar este
+            CreateMap<User, LoginModel>().ReverseMap();
         }
     }
 }

@@ -137,8 +137,9 @@ namespace ECommerce.Data
                .HasData(new
                {
                    UserId = 1,
-                   UserName = "Maikel",
-                   Password = "Maikel"
+                   UserName = "maikel",
+                   Email = "maikelrd@gmail.com",
+                   Password = "maikel"
                });
         }
     }

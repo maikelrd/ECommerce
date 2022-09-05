@@ -20,6 +20,21 @@ namespace ECommerce.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Users",
+                columns: table => new
+                {
+                    UserId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Password = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Users", x => x.UserId);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Categories",
                 columns: table => new
                 {
@@ -69,17 +84,19 @@ namespace ECommerce.Migrations
             migrationBuilder.InsertData(
                 table: "Departments",
                 columns: new[] { "DepartmentId", "DepartmentName" },
-                values: new object[] { 1, "Electronic" });
+                values: new object[,]
+                {
+                    { 1, "Electronic" },
+                    { 2, "Computer" },
+                    { 3, "Food & Grocery" },
+                    { 4, "Books" },
+                    { 5, "Movies, Music & Games" }
+                });
 
             migrationBuilder.InsertData(
-                table: "Departments",
-                columns: new[] { "DepartmentId", "DepartmentName" },
-                values: new object[] { 2, "Computer" });
-
-            migrationBuilder.InsertData(
-                table: "Departments",
-                columns: new[] { "DepartmentId", "DepartmentName" },
-                values: new object[] { 3, "Food & Grocery" });
+                table: "Users",
+                columns: new[] { "UserId", "Email", "Password", "UserName" },
+                values: new object[] { 1, null, "Maikel", "Maikel" });
 
             migrationBuilder.InsertData(
                 table: "Categories",
@@ -99,17 +116,13 @@ namespace ECommerce.Migrations
             migrationBuilder.InsertData(
                 table: "Products",
                 columns: new[] { "ProductId", "CategoryId", "Description", "ImageUrl", "ProductCode", "ProductName", "ReleaseDate", "StarRating", "StockQty", "UnitPrice" },
-                values: new object[] { 1, 1, "Tv Samsung 32'' ", "", "TV1234", "TV Samsung", "2020/10,/18", 4.3m, 10, 245m });
-
-            migrationBuilder.InsertData(
-                table: "Products",
-                columns: new[] { "ProductId", "CategoryId", "Description", "ImageUrl", "ProductCode", "ProductName", "ReleaseDate", "StarRating", "StockQty", "UnitPrice" },
-                values: new object[] { 2, 2, "Laptop dell i7 ", "", "laptopdell", "Laptop Dell", "2021/10,/18", 4.5m, 20, 831m });
-
-            migrationBuilder.InsertData(
-                table: "Products",
-                columns: new[] { "ProductId", "CategoryId", "Description", "ImageUrl", "ProductCode", "ProductName", "ReleaseDate", "StarRating", "StockQty", "UnitPrice" },
-                values: new object[] { 3, 3, "Apples bag 5 pounds ", "", "apple012", "Apples bag", "2022/10,/18", 4.0m, 2, 9m });
+                values: new object[,]
+                {
+                    { 1, 1, "Tv Samsung 32'' ", "", "TV1234", "TV Samsung", "2020/10,/18", 4.3m, 10, 245m },
+                    { 2, 2, "Laptop dell i7 ", "", "laptopdell", "Laptop Dell", "2021/10,/18", 4.5m, 20, 831m },
+                    { 4, 2, "Wireless Color All-in-One", "", "hp2755e", "HP Deskjet 2755e", "2021/24/4", 4.1m, 4, 76.0m },
+                    { 3, 3, "Apples bag 5 pounds ", "", "apple012", "Apples bag", "2022/10/18", 4.0m, 2, 9m }
+                });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Categories_DepartmentId",
@@ -126,6 +139,9 @@ namespace ECommerce.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Products");
+
+            migrationBuilder.DropTable(
+                name: "Users");
 
             migrationBuilder.DropTable(
                 name: "Categories");

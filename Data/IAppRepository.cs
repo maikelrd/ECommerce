@@ -30,5 +30,6 @@ namespace ECommerce.Data
         Task<User[]> GetAllUserAsync();
         Task<User> GetUserByIdAsync(int id);
         Task<User> GetUserByNameAsync(string name);
+        Task<User> GetUserByEmailAsync(string email);
     }
 }
