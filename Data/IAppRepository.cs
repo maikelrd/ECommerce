@@ -1,4 +1,5 @@
 ﻿using ECommerce.Data.Entities;
+using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
 namespace ECommerce.Data
@@ -31,5 +32,22 @@ namespace ECommerce.Data
         Task<User> GetUserByIdAsync(int id);
         Task<User> GetUserByNameAsync(string name);
         Task<User> GetUserByEmailAsync(string email);
+
+        //ShoppingCart
+        Task<ShoppingCartItem[]> GetAllCartsAsync();        
+        //Task<IActionResult> ClearCart(int id);
+        Task<ShoppingCartItem> GetCartByIdAsync(int id);
+         Task<ShoppingCartItem[]> GetCartsByUserAsync(int userId);
+        //Task<IActionResult> AddToCart(ShoppingCartItem shoppingCartItem);
+        //Task<IActionResult> RemoveFromCart
+        //Task ClearCart(string email);
+        public void ClearCart(int userId);
+        // Task<decimal> GetShoppingCartTotal(User user);
+        decimal GetShoppingCartTotal(int id);
+
+        ShoppingCartItem GetCartByProduct(Product product);
+        //ShoppingCartItem GetCartById(int id);
+        ShoppingCartItem GetCartByNotProduct(Product product);
+
     }
 }

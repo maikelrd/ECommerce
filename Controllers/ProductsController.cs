@@ -27,8 +27,7 @@ namespace ECommerce.Controllers
             _linkGenerator = linkGenerator;
         }
 
-        [HttpGet]
-        [Authorize]
+        [HttpGet]       
         public async Task<ActionResult<ProductModel[]>> Get()
         {
             try
@@ -60,6 +59,7 @@ namespace ECommerce.Controllers
         }
 
         [HttpPost]
+       // [Authorize]
         public async Task<ActionResult<ProductModel>> Post(ProductModel model)
         {
             try
@@ -96,6 +96,7 @@ namespace ECommerce.Controllers
         }
 
         [HttpPut("{id}")]
+       // [Authorize]
         public async Task<ActionResult<ProductModel>> Put(int id, ProductModel model)
         {
             try
@@ -119,6 +120,7 @@ namespace ECommerce.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize]
         public async Task<IActionResult> Delete(int id)
         {
             try

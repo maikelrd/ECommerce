@@ -20,6 +20,7 @@ namespace ECommerce.Data
         public DbSet<Product> Products { get; set; }
         public DbSet<Department> Departments { get; set; }
         public DbSet<Category> Categories { get; set; }
+        public DbSet<ShoppingCartItem> ShoppingCartItems { get; set; }
         public DbSet<User> Users { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -76,7 +77,13 @@ namespace ECommerce.Data
                    CategoryId = 3,
                    CategoryName = "Grocery",
                    DepartmentId = 3
-               });
+               },
+                new
+                {
+                    CategoryId = 4,
+                    CategoryName = "Video Games",
+                    DepartmentId = 1
+                });
 
             bldr.Entity<Product>()
                 .HasData(
@@ -91,7 +98,8 @@ namespace ECommerce.Data
                     StockQty = 10,
                     Description = "Tv Samsung 32'' ",
                     StarRating = 4.3m,
-                    ImageUrl = ""
+                    ImageUrl = "/assets/images/711qRHKMRTL._AC_UY218_.jpg",
+                   // ShoppingCartItemId = 0
                 }, new
                 {
                     ProductId = 2,
@@ -103,7 +111,8 @@ namespace ECommerce.Data
                     StockQty = 20,
                     Description = "Laptop dell i7 ",
                     StarRating = 4.5m,
-                    ImageUrl = ""
+                    ImageUrl = "/assets/images/Dell-Laptop.png",
+                    //ShoppingCartItemId = 0
                 },
                 new
                 {
@@ -116,7 +125,8 @@ namespace ECommerce.Data
                     StockQty = 2,
                     Description = "Apples bag 5 pounds ",
                     StarRating = 4.0m,
-                    ImageUrl = ""
+                    ImageUrl = "/assets/images/71gcGpnE02L._AC_UL320_.jpg",
+                   // ShoppingCartItemId = 0
                 },
                 new
                 {
@@ -129,18 +139,47 @@ namespace ECommerce.Data
                     StockQty = 4,
                     Description = "Wireless Color All-in-One",
                     StarRating = 4.1m,
-                    ImageUrl = ""
-                });
+                    ImageUrl = "/assets/images/61UdeL7aO-L._AC_SL1500_.jpg",
+                  //  ShoppingCartItemId = 0
+                },
+                  new
+                  {
+                      ProductId = 5,
+                      ProductName = "GT MEDIA V7S2X",
+                      ProductCode = "saltel",
+                      ReleaseDate = "2021/10/1",
+                      CategoryId = 1,
+                      UnitPrice = 39.0m,
+                      StockQty = 7,
+                      Description = "Decodificador Satelital for Astra 19.2E Galaxy 19 97W",
+                      StarRating = 3.9m,
+                      ImageUrl = "/assets/images/61BHMp1llML._AC_SL1500_.jpg",
+                    //  ShoppingCartItemId = 0
+                  }) ;
+         
 
             //Users
             bldr.Entity<User>()
                .HasData(new
                {
                    UserId = 1,
-                   UserName = "maikel",
+                   FirstName = "maikel",
+                   LastName = "ramirez",
                    Email = "maikelrd@gmail.com",
                    Password = "maikel"
                });
-        }
+
+            //ShoppingCartItem
+            bldr.Entity<ShoppingCartItem>()
+               .HasData(new
+               {
+                   ShoppingCartItemId = 1,
+                     UserId = 1,
+                    ProductId = 1,
+                    Amount =2
+               }); ;
+
+     
+    }
     }
 }

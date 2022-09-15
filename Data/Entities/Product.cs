@@ -20,5 +20,6 @@ namespace ECommerce.Data.Entities
         [Column(TypeName = "decimal(18,2)")]
         public decimal StarRating { get; set; }
         public string ImageUrl { get; set; }
+        //public int ShoppingCartItemId { get; set; }
     }
 }

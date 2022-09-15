@@ -19,6 +19,8 @@ namespace ECommerce.Data
 
             //revisar este
             CreateMap<User, LoginModel>().ReverseMap();
+            CreateMap<User, RegisterModel>().ReverseMap();
+            CreateMap<ShoppingCartItem, ShoppingCartModel>().ReverseMap();
         }
     }
 }

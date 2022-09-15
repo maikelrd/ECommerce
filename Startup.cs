@@ -100,7 +100,7 @@ namespace ECommerce
             app.UseRouting();
 
             app.UseCors(option =>
-                option.WithOrigins("http://localhost:4200")
+                option.AllowAnyOrigin()
                 .AllowAnyMethod().AllowAnyHeader());
 
             app.UseAuthentication();

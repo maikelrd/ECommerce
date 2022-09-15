@@ -63,15 +63,15 @@ namespace ECommerce.Controllers
 
 
 
-        [HttpPost]
-        public async Task<ActionResult<UserModel>> Post(UserModel model)
+        [HttpPost("RegisterUser")]
+        public async Task<ActionResult<RegisterModel>> Post(UserModel model)
         {
             try
             {
-                var existing = await _repository.GetUserByNameAsync(model.UserName);
+                var existing = await _repository.GetUserByEmailAsync(model.Email);
                 if (existing != null)
                 {
-                    return BadRequest("UserName in use");
+                    return BadRequest("Email in use");
                 }
 
                 var user = _mapper.Map<User>(model);
@@ -85,7 +85,8 @@ namespace ECommerce.Controllers
                     {
                         return BadRequest("Could not use current UserId");
                     }
-                    return Created(location, _mapper.Map<UserModel>(user));
+                    //Here i put registerModel, because if return a UserModel, then send back the password to the backend.
+                    return Created(location, _mapper.Map<RegisterModel>(user));
                 }
                
             }
