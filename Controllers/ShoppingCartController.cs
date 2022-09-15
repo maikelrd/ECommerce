@@ -42,7 +42,7 @@ namespace ECommerce.Controllers
                 return this.StatusCode(StatusCodes.Status500InternalServerError, "Database Failure");
             }
         }
-      
+
         [HttpGet("email")]
         public async Task<ActionResult<ShoppingCartModel[]>> Get(string email)
         {
@@ -68,13 +68,13 @@ namespace ECommerce.Controllers
         {
             try
             {
-                var user = await _repository.GetUserByEmailAsync(shoppingCartModel.UserEmail); 
-               // var product = _mapper.Map<Product>(shoppingCartModel.Product);
-                var shoppingCartItem =  _repository.GetCartByNotProduct(shoppingCartModel.Product);
+                var user = await _repository.GetUserByEmailAsync(shoppingCartModel.UserEmail);
+                // var product = _mapper.Map<Product>(shoppingCartModel.Product);
+                var shoppingCartItem = _repository.GetCartByNotProduct(shoppingCartModel.Product);
                 if (shoppingCartItem == null)
                 {
                     //var addShoppingCart = _mapper.Map<ShoppingCartItem>(shoppingCartModel);
-                     shoppingCartItem = new ShoppingCartItem
+                    shoppingCartItem = new ShoppingCartItem
                     {
                         ShoppingCartItemId = 0,
                         ProductId = shoppingCartModel.ProductId,
@@ -85,8 +85,8 @@ namespace ECommerce.Controllers
                     if (await _repository.SaveChangesAsync())
                     {
                         var location = _linkGenerator.GetPathByAction("Get", "ShoppingCart",
-                                                           new  { email = shoppingCartModel.UserEmail });
-                       
+                                                           new { email = shoppingCartModel.UserEmail });
+
                         return Created(location, _mapper.Map<ShoppingCartModel>(shoppingCartItem));
                     }
                 }
@@ -99,7 +99,7 @@ namespace ECommerce.Controllers
                     }
                 }
 
-               
+
             }
             catch (Exception ex)
             {
@@ -108,6 +108,87 @@ namespace ECommerce.Controllers
             }
             return BadRequest();
         }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult<ShoppingCartModel>> Put(int id,ShoppingCartModel model)
+        {
+            try
+            {
+                var oldShoppingCart = await _repository.GetCartByIdAsync(id);
+                if (oldShoppingCart == null)
+                {
+                    return NotFound($"Could not find ShoppingCart with Id  {id}");
+                }
+
+                // _mapper.Map(model, oldShoppingCart);
+                oldShoppingCart.Amount = model.Amount;
+                if (await _repository.SaveChangesAsync())
+                {
+                    return _mapper.Map<ShoppingCartModel>(oldShoppingCart);
+                }
+            }
+            catch (Exception ex)
+            {
+
+                Console.WriteLine(ex);
+                return this.StatusCode(StatusCodes.Status500InternalServerError, "Database Failure");
+            }
+            return BadRequest();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            try
+            {
+                var oldShoppingCart =await  _repository.GetCartByIdAsync(id);
+                if (oldShoppingCart == null)
+                {
+                    return NotFound($"Could not find ShoppingCart with Id  {id}");
+                }
+                _repository.Delete(oldShoppingCart);
+                if (await _repository.SaveChangesAsync())
+                {
+                    return Ok("Delete ShoppingCartItem successed");
+                }
+            }
+            catch (Exception ex)
+            {
+
+                Console.WriteLine(ex);
+                return this.StatusCode(StatusCodes.Status500InternalServerError, "Database Failure");
+            }
+            return BadRequest("Failed to delete the ShoppingCart Item");
+        }
+        
+        [HttpDelete("email")]
+        
+        public async Task<IActionResult> Delete(string email)
+        {
+            try
+            {
+                var user = await _repository.GetUserByEmailAsync(email);
+                if (user == null)
+                {
+                    return NotFound("Invalid user to clear shoppingcart");
+                }
+
+                //var results = await _repository.GetCartsByUserAsync(user.UserId);
+                _repository.ClearCart(user.UserId);
+                if (await _repository.SaveChangesAsync())
+                {
+                    return Ok("Deleting ShoppingCart successed");
+                }
+            }
+            catch (Exception)
+            {
+
+                return this.StatusCode(StatusCodes.Status500InternalServerError, "Database Failure");
+            }
+            return BadRequest("Failed to delete the ShoppingCart");
+        }
+
+
 
     }
 }

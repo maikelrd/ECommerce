@@ -204,7 +204,7 @@ namespace ECommerce.Data
         {
             _logger.LogInformation($"Getting a Shopping Cart for Id:  {id}");
             IQueryable<ShoppingCartItem> query = _context.ShoppingCartItems.Where(c => c.ShoppingCartItemId == id)
-                                                                           .Include(p => p.ProductId);
+                                                                           .Include(p => p.Product);
             return  query.FirstOrDefaultAsync();
         }
 
