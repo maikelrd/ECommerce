@@ -43,9 +43,29 @@ namespace ECommerce.Controllers
             }
         }
 
+        //[HttpGet("{id}")]
+        //public async Task<ActionResult<ShoppingCartModel>> Get(int id)
+        //{
+        //    try
+        //    {
+        //        var result = await _repository.GetCartByIdAsync(id);
+        //        if (result == null)
+        //        {
+        //            return NotFound("Invalid id to return shopping cart");
+        //        }
+                
+        //        return _mapper.Map<ShoppingCartModel>(result);
+        //    }
+        //    catch (Exception)
+        //    {
+
+        //        return this.StatusCode(StatusCodes.Status500InternalServerError, "Database Failure");
+        //    }
+        //}
+
         [HttpGet("email")]
         public async Task<ActionResult<ShoppingCartModel[]>> Get(string email)
-        {
+       {
             try
             {
                 var user = await _repository.GetUserByEmailAsync(email);
@@ -69,8 +89,12 @@ namespace ECommerce.Controllers
             try
             {
                 var user = await _repository.GetUserByEmailAsync(shoppingCartModel.UserEmail);
-                // var product = _mapper.Map<Product>(shoppingCartModel.Product);
-                var shoppingCartItem = _repository.GetCartByNotProduct(shoppingCartModel.Product);
+                if (user == null)
+                {
+                    return BadRequest($"Incorrect user email: {shoppingCartModel.UserEmail}");
+                }
+
+                var shoppingCartItem = _repository.GetCartByNotProduct(shoppingCartModel.Product, user.UserId);
                 if (shoppingCartItem == null)
                 {
                     //var addShoppingCart = _mapper.Map<ShoppingCartItem>(shoppingCartModel);
@@ -95,7 +119,10 @@ namespace ECommerce.Controllers
                     shoppingCartItem.Amount++;
                     if (await _repository.SaveChangesAsync())
                     {
-                        return Ok("Update amount");
+                        //return Ok("Update amount");
+                        var location = _linkGenerator.GetPathByAction("Get", "ShoppingCart",
+                                                          new { email = shoppingCartModel.UserEmail });
+                        return Created(location, _mapper.Map<ShoppingCartModel>(shoppingCartItem));
                     }
                 }
 

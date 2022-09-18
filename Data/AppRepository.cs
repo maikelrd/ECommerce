@@ -222,9 +222,9 @@ namespace ECommerce.Data
                 Include(p =>p.Product);
             return  query.FirstOrDefault();
         }
-        public ShoppingCartItem GetCartByNotProduct(Product product)
+        public ShoppingCartItem GetCartByNotProduct(Product product, int userId)
         {
-            var query = _context.ShoppingCartItems.Where(p => p.ProductId == product.ProductId);
+            var query = _context.ShoppingCartItems.Where(s => s.ProductId == product.ProductId && s.UserId == userId);
               
             return query.FirstOrDefault();
         }

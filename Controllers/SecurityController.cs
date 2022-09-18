@@ -43,7 +43,7 @@ namespace ECommerce.Controllers
                 {
                     if (model.Password == appUser.Password)
                     {
-                        var user = new UserDTO(appUser.FirstName);
+                        var user = new UserDTO(appUser.FirstName, appUser.Email);
                         user.IsAuthenticated = true;
                         
                         user.Token = GenerateToken(user);

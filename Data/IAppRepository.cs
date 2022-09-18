@@ -47,7 +47,7 @@ namespace ECommerce.Data
 
         ShoppingCartItem GetCartByProduct(Product product);
         //ShoppingCartItem GetCartById(int id);
-        ShoppingCartItem GetCartByNotProduct(Product product);
+        ShoppingCartItem GetCartByNotProduct(Product product, int userId);
 
     }
 }
