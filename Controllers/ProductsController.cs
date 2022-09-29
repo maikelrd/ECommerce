@@ -59,18 +59,22 @@ namespace ECommerce.Controllers
         }
 
         [HttpPost]
-       // [Authorize]
-        public async Task<ActionResult<ProductModel>> Post(ProductModel model)
+       // [Consumes("multipart/form-data")]
+        // [Authorize]
+         public async Task<ActionResult<ProductModel>> Post(ProductModel model)
+     
         {
             try
             {
+
+
                 var existing = await _repository.GetProductByName(model.ProductName);
-                if (existing !=null)
+                if (existing != null)
                 {
                     return BadRequest("Name is in use");
                 }
 
-                
+
                 //Create new product
                 var product = _mapper.Map<Product>(model);
                 _repository.Add(product);
@@ -87,9 +91,9 @@ namespace ECommerce.Controllers
                     return Created(location, _mapper.Map<ProductModel>(product));
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
+                Console.WriteLine(ex);
                 return this.StatusCode(StatusCodes.Status500InternalServerError, "Database Failure");
             }
             return BadRequest();
@@ -120,7 +124,7 @@ namespace ECommerce.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize]
+        //[Authorize]
         public async Task<IActionResult> Delete(int id)
         {
             try
