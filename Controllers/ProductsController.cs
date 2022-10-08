@@ -6,8 +6,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -58,41 +60,79 @@ namespace ECommerce.Controllers
             }
         }
 
+        [Produces("application/json")]
         [HttpPost]
-       // [Authorize]
-        public async Task<ActionResult<ProductModel>> Post(ProductModel model)
+        [Consumes("multipart/form-data")]
+        // [Authorize]
+        public async Task<ActionResult<ProductModel>> Post([FromForm] FileModel fileObj)
         {
             try
             {
-                var existing = await _repository.GetProductByName(model.ProductName);
-                if (existing !=null)
+                
+                ProductModel productModel = JsonConvert.DeserializeObject<ProductModel>(fileObj.Product);
+                var existing = await _repository.GetProductByName(productModel.ProductName);
+                if (existing != null)
                 {
                     return BadRequest("Name is in use");
                 }
 
-                
-                //Create new product
-                var product = _mapper.Map<Product>(model);
+                var product = _mapper.Map<Product>(productModel);
                 _repository.Add(product);
-
                 if (await _repository.SaveChangesAsync())
 
                 {
-                    var location = _linkGenerator.GetPathByAction("Get", "Products",
-                                                               new { id = product.ProductId });
-                    if (string.IsNullOrWhiteSpace(location))
-                    {
-                        return BadRequest("Could not use current ProductId");
-                    }
-                    return Created(location, _mapper.Map<ProductModel>(product));
-                }
-            }
-            catch (Exception)
-            {
+                    //productImages.ProductId = product.ProductId;
+                    Console.WriteLine("creating new product");
 
+                }
+
+
+
+                ImageModel ImageModel = new ImageModel();
+
+                for (int i = 0; i < fileObj.ImageFile.Length; i++)
+                {
+                    if (fileObj.ImageFile[i].Length > 0)
+                    {
+                        using (var ms = new MemoryStream())
+                        {
+                            fileObj.ImageFile[i].CopyTo(ms);
+                            var fileBytes = ms.ToArray();
+                            var temp = Convert.ToBase64String(fileBytes);
+                            ImageModel.PicByte = temp;
+                        }
+                        ImageModel.Name = fileObj.ImageFile[i].FileName;
+                        ImageModel.Type = fileObj.ImageFile[i].ContentType;
+
+                        var image = _mapper.Map<Image>(ImageModel);
+                        image.ProductId = product.ProductId;
+                        _repository.Add(image);
+                        if (await _repository.SaveChangesAsync())
+                        {
+                            Console.WriteLine("Saving Image in database");
+                            // productModel.ImageId = image.Id;
+                            // productModel.Image = null;
+                        }
+
+                       
+                    }
+
+                }
+                var location = _linkGenerator.GetPathByAction("Get", "Products",
+                                                              new { id = product.ProductId });
+                if (string.IsNullOrWhiteSpace(location))
+                {
+                    return BadRequest("Could not use current ProductId");
+                }
+                return Created(location, _mapper.Map<ProductModel>(product));
+
+            }
+            catch (Exception ex )
+            {
+                Console.WriteLine(ex);
                 return this.StatusCode(StatusCodes.Status500InternalServerError, "Database Failure");
             }
-            return BadRequest();
+           // return BadRequest();
         }
 
         [HttpPut("{id}")]
@@ -120,7 +160,7 @@ namespace ECommerce.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize]
+       // [Authorize]
         public async Task<IActionResult> Delete(int id)
         {
             try

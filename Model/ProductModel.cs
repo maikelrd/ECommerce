@@ -21,6 +21,7 @@ namespace ECommerce.Model
         public int StockQty { get; set; }
         public string Description { get; set; }        
         public decimal StarRating { get; set; }
-        public string ImageUrl { get; set; }
+        // public string ImageUrl { get; set; }
+        public List<Image> Images { get; set; }
     }
 }

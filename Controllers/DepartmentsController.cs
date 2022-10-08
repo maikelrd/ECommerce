@@ -84,9 +84,9 @@ namespace ECommerce.Controllers
                     return Created(location, _mapper.Map<DepartmentModel>(department));
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
+                Console.WriteLine(ex);
                 return this.StatusCode(StatusCodes.Status500InternalServerError, "Database Failure");
             }
             return BadRequest();

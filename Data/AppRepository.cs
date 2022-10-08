@@ -128,7 +128,7 @@ namespace ECommerce.Data
             IQueryable<Product> query = _context.Products;
 
 
-            query = query.OrderByDescending(p => p.ProductName);
+            query = query.OrderByDescending(p => p.ProductName).Include(i =>i.Images);
             return await query.ToArrayAsync();
         }
 
@@ -136,16 +136,27 @@ namespace ECommerce.Data
         {
             _logger.LogInformation($"Getting Product for id = {id}");
 
-            IQueryable<Product> query = _context.Products.Where(p => p.ProductId == id);
+            IQueryable<Product> query = _context.Products.Where(p => p.ProductId == id).Include(i => i.Images);
 
             return await query.FirstOrDefaultAsync();
+        }
+
+        public async Task<Product[]> GetAllProductsByCategoryAsync(int id)
+        {
+            _logger.LogInformation($"Getting all Products");
+            IQueryable<Product> query = _context.Products;
+
+
+            query = query.OrderByDescending(p => p.ProductName).Include(i => i.Images);
+            query = query.Where(p => p.CategoryId == id);
+            return await query.ToArrayAsync();
         }
 
         public async Task<Product> GetProductByName(string name)
         {
             _logger.LogInformation($"Getting Product for name = {name}");
 
-            IQueryable<Product> query = _context.Products.Where(p => p.ProductName == name);
+            IQueryable<Product> query = _context.Products.Where(p => p.ProductName == name).Include(i =>i.Images);
 
             return await query.FirstOrDefaultAsync();
         }

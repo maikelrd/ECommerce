@@ -48,6 +48,11 @@ namespace ECommerce.Controllers
             try
             {
                 var result = await _repository.GetCategoryById(id, includeProducts);
+
+                var products = await _repository.GetAllProductsByCategoryAsync(id);
+
+                result.Products = products.ToList();
+
                 if (result == null) return NotFound();
                 return _mapper.Map<CategoryModel>(result);
             }
@@ -82,9 +87,9 @@ namespace ECommerce.Controllers
                     return Created(location, _mapper.Map<CategoryModel>(category));
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
+                Console.WriteLine(ex);
                 return this.StatusCode(StatusCodes.Status500InternalServerError, "Database Failure");
             }
             return BadRequest();

@@ -16,6 +16,8 @@ namespace ECommerce.Data
         Task<Category> GetCategoryById(int id, bool includeProducts = false);
         Task<Category> GetCategoryByName(string name, bool includeProducts = false);
 
+        Task<Product[]> GetAllProductsByCategoryAsync(int id);
+
         //Department
         Task<Department[]> GetAllDepartmentsAsync(bool includeCategories = false);
 
