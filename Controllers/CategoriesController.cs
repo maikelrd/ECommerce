@@ -43,15 +43,16 @@ namespace ECommerce.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<CategoryModel>> Get(int id, bool includeProducts = true)
+        public async Task<ActionResult<CategoryModel>> Get(int id, bool includeProducts = false)
         {
             try
             {
                 var result = await _repository.GetCategoryById(id, includeProducts);
 
-                var products = await _repository.GetAllProductsByCategoryAsync(id);
+                //I add pagination to category, for that reason I do not need to get the products here, only need information about the category
+                //var products = await _repository.GetAllProductsByCategoryAsync(id);
 
-                result.Products = products.ToList();
+                //result.Products = products.ToList();
 
                 if (result == null) return NotFound();
                 return _mapper.Map<CategoryModel>(result);

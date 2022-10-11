@@ -23,11 +23,20 @@ namespace ECommerce.Data
 
         Task<Department> GetDepartmentById(int id, bool includeCategories = false);
         Task<Department> GetDepartmentByName(string name, bool includeCategories = false);
-        Task<Product[]> GetAllProductsAsync();
-   
+
+
         //Product
+        Task<Product[]> GetAllProductsAsync();
         Task<Product> GetProductById(int id);
         Task<Product> GetProductByName(string name);
+        Task<Product[]> GetProductsByPage(int page);
+        int GetCountProducts();
+        Task<Product[]> GetProductsByCategoryAndPage(int categoryId, int page);
+        int GetCountProductsByCategory(int categoryId);
+        Task<Product[]> GetProductsFilter(string filterBy);
+
+        //filter
+        Task<Product[]> GetProductsByCategoryFilter(int categoryId,string filterBy);
 
         //User
         Task<User[]> GetAllUserAsync();

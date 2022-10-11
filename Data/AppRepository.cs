@@ -125,10 +125,9 @@ namespace ECommerce.Data
         public async Task<Product[]> GetAllProductsAsync()
         {
             _logger.LogInformation($"Getting all Products");
-            IQueryable<Product> query = _context.Products;
+            IQueryable<Product> query = _context.Products.Include(i=> i.Images);
 
-
-            query = query.OrderByDescending(p => p.ProductName).Include(i =>i.Images);
+          //  query = query.OrderByDescending(p => p.ProductName);
             return await query.ToArrayAsync();
         }
 
@@ -144,11 +143,11 @@ namespace ECommerce.Data
         public async Task<Product[]> GetAllProductsByCategoryAsync(int id)
         {
             _logger.LogInformation($"Getting all Products");
-            IQueryable<Product> query = _context.Products;
+            IQueryable<Product> query = _context.Products.Where(p => p.CategoryId == id).Include(i => i.Images);
 
 
-            query = query.OrderByDescending(p => p.ProductName).Include(i => i.Images);
-            query = query.Where(p => p.CategoryId == id);
+           // query = query.OrderByDescending(p => p.ProductName).Include(i => i.Images);
+           // query = query.Where(p => p.CategoryId == id);
             return await query.ToArrayAsync();
         }
 
@@ -159,6 +158,72 @@ namespace ECommerce.Data
             IQueryable<Product> query = _context.Products.Where(p => p.ProductName == name).Include(i =>i.Images);
 
             return await query.FirstOrDefaultAsync();
+        }
+
+        //products by page *it is  not in use*
+        public async Task<Product[]> GetProductsByPage(int page)
+        {
+            _logger.LogInformation($"Getting Product for page = {page}");
+            int temp = page * 10;
+            int temp1 = temp + 10;
+
+            //IQueryable<Product> query = _context.Products.Where(p => p.ProductId >= page * 10 && p.ProductId < page * 10 + 10).Include(i => i.Images);
+            IQueryable<Product> query = _context.Products.Where(p => p.ProductId >= page * 10 && p.ProductId < page * 10 + 10).Include(i => i.Images);
+
+            return await query.ToArrayAsync();
+        }
+
+        //total of products
+        public int GetCountProducts()
+        {
+            _logger.LogInformation("Getting count of Product ");
+
+            int count = _context.Products.Count();
+
+            return count;
+        }
+
+        //get products filter
+        public async Task<Product[]> GetProductsFilter(string filterBy)
+        {
+            IQueryable<Product> query = _context.Products.Where(p => p.ProductName.ToLower().Contains(filterBy)).Include(i => i.Images);
+
+            return await query.ToArrayAsync();
+
+        }
+
+        //product by category and page *it is  not in use*
+        public async Task<Product[]> GetProductsByCategoryAndPage(int categoryId, int page)
+        {
+            _logger.LogInformation($"Getting Product for category = {categoryId} and page = {page}");
+
+
+            //IQueryable<Product> query = _context.Products.Where(p => p.ProductId >= page * 10 && p.ProductId < page * 10 + 10).Include(i => i.Images);
+            // IQueryable<Product> query = _context.Products.Where(p => (p.ProductId >= page * 10 && p.CategoryId == categoryId)&&( p.ProductId < page * 10 + 10 && p.CategoryId==categoryId)).Include(i => i.Images);
+            IQueryable<Product> query = _context.Products.Where(p =>  p.CategoryId == categoryId).Include(i => i.Images);
+
+            return await query.ToArrayAsync();
+        }
+
+        //total of products by category
+        public int GetCountProductsByCategory(int categoryId)
+        {
+            _logger.LogInformation("Getting count of Product by category");
+
+            int count = _context.Products.Where(p=> p.CategoryId == categoryId).Count();
+
+            return count;
+        }
+
+        //Category products filter by a text
+
+       
+        public async Task<Product[]> GetProductsByCategoryFilter(int categoryId, string filterBy)
+        {
+            IQueryable<Product> query = _context.Products.Where(p => p.ProductName.ToLower().Contains(filterBy) && p.CategoryId == categoryId).Include(i => i.Images);
+
+            return await query.ToArrayAsync();
+
         }
 
         //Users
