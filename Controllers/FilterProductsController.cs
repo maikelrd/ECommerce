@@ -14,12 +14,12 @@ namespace ECommerce.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class FilterController : ControllerBase
+    public class FilterProductsController : ControllerBase
     {
         private readonly IAppRepository _repository;
         private readonly IMapper _mapper;
         private readonly LinkGenerator _linkGenerator;
-        public FilterController(IAppRepository repository, IMapper mapper, LinkGenerator linkGenerator)
+        public FilterProductsController(IAppRepository repository, IMapper mapper, LinkGenerator linkGenerator)
         {
             _repository = repository;
             _mapper = mapper;
@@ -27,21 +27,13 @@ namespace ECommerce.Controllers
         }
 
         [HttpGet("{filterText}")]
-        public async Task<ActionResult<FilterModel>> Get( string filterText)
+        public ActionResult<int> Get(string filterText)
         {
             try
             {
-                FilterModel filterModel = new FilterModel();
-                ProductModel productModel = new ProductModel();
-
-                var filter = filterText.ToLower();
-                var results = await _repository.GetProductsFilter( filter);
-                filterModel.count = results.Count();
-
-                filterModel.Products = _mapper.Map<ProductModel[]>(results);
-
-                return filterModel;
-
+                filterText.ToLower();
+                var count = _repository.GetCountProductsFilter(filterText);
+                return count;
             }
             catch (Exception ex)
             {
@@ -50,22 +42,30 @@ namespace ECommerce.Controllers
                 return this.StatusCode(StatusCodes.Status500InternalServerError, "Database Failure");
             }
         }
-
-        [HttpGet("{categoryId}/{filterText}")]
-        public async Task<ActionResult<FilterModel>> Get(int categoryId, string filterText)
+        [HttpGet("{page}/{filterText}")]
+        public async Task<ActionResult<ProductModel[]>> Get(int page, string filterText)
         {
             try
             {
-                FilterModel filterModel = new FilterModel();
+                //FilterModel filterModel = new FilterModel();
                 ProductModel productModel = new ProductModel();
                
-                var filter = filterText.ToLower();
-                var results = await _repository.GetProductsByCategoryFilter(categoryId, filter);
-                filterModel.count = results.Count();
 
-                filterModel.Products = _mapper.Map<ProductModel[]>(results);
-               
-                return filterModel;
+                var filter = filterText.ToLower();
+                var results = await _repository.GetProductsFilter(filter);
+                if (results == null) return NotFound();               ;
+                //filterModel.Products = _mapper.Map<ProductModel[]>(results);
+
+                List<Product> productsBypage = new List<Product>();
+                for (int i = 0; i < results.Length; i++)
+                {
+                    if ((i >= page * 10) && (i < page * 10 + 10))
+                    {
+                        productsBypage.Add(results[i]);
+                    }
+                }
+
+                return _mapper.Map<ProductModel[]>(productsBypage);
 
             }
             catch (Exception ex)

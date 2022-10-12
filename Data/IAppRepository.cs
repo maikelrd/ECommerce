@@ -31,11 +31,13 @@ namespace ECommerce.Data
         Task<Product> GetProductByName(string name);
         Task<Product[]> GetProductsByPage(int page);
         int GetCountProducts();
+        int GetCountProductsFilter(string textFilter);
         Task<Product[]> GetProductsByCategoryAndPage(int categoryId, int page);
         int GetCountProductsByCategory(int categoryId);
         Task<Product[]> GetProductsFilter(string filterBy);
 
         //filter
+        int GetCountProductsByCategoryFilter(int categoryId, string filterText);
         Task<Product[]> GetProductsByCategoryFilter(int categoryId,string filterBy);
 
         //User

@@ -183,6 +183,16 @@ namespace ECommerce.Data
             return count;
         }
 
+        //total of products filter
+        public int GetCountProductsFilter(string textFilter)
+        {
+            _logger.LogInformation("Getting count of Product ");
+
+            int count = _context.Products.Where(p => p.ProductName.ToLower().Contains(textFilter)).Count();
+
+            return count;
+        }
+
         //get products filter
         public async Task<Product[]> GetProductsFilter(string filterBy)
         {
@@ -210,15 +220,25 @@ namespace ECommerce.Data
         {
             _logger.LogInformation("Getting count of Product by category");
 
-            int count = _context.Products.Where(p=> p.CategoryId == categoryId).Count();
+            int count = _context.Products.Where(p => p.CategoryId == categoryId).Count();
 
             return count;
         }
 
-        //Category products filter by a text
+            //total of products by category and filterText
+            public int GetCountProductsByCategoryFilter(int categoryId, string filterText)
+            {
+                _logger.LogInformation("Getting count of Product by category");
 
-       
-        public async Task<Product[]> GetProductsByCategoryFilter(int categoryId, string filterBy)
+                int count = _context.Products.Where(p => p.ProductName.ToLower().Contains(filterText) && p.CategoryId == categoryId).Count();
+
+                return count;
+            }
+
+            //Category products filter by a text
+
+
+            public async Task<Product[]> GetProductsByCategoryFilter(int categoryId, string filterBy)
         {
             IQueryable<Product> query = _context.Products.Where(p => p.ProductName.ToLower().Contains(filterBy) && p.CategoryId == categoryId).Include(i => i.Images);
 
