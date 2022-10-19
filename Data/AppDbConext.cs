@@ -24,6 +24,9 @@ namespace ECommerce.Data
         public DbSet<ShoppingCartItem> ShoppingCartItems { get; set; }
         public DbSet<User> Users { get; set; }
 
+        public DbSet<ShoppingCart> ShoppingCarts { get; set; }
+        public DbSet<ProductShoppingCart> productsShoppingCarts { get; set; }
+
     //    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     //    {
     //        optionsBuilder.UseSqlServer(_config.GetConnectionString("ECommerce"));

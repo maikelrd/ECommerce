@@ -275,7 +275,7 @@ namespace ECommerce.Data
             return await query.FirstOrDefaultAsync();
         }
 
-        //ShoppingCarts
+        //ShoppingCarts old
         public async Task<ShoppingCartItem[]> GetAllCartsAsync()
         {
             _logger.LogInformation($"Getting all ShoppingCarts");
@@ -347,5 +347,78 @@ namespace ECommerce.Data
         return 0;
 
         }
+
+        //ShoppingCarts New
+        public async Task<ShoppingCart[]> GetAllShoppingCartsAsync()
+        {
+            _logger.LogInformation($"Getting all ShoppingCarts");
+
+            IQueryable<ShoppingCart> query = _context.ShoppingCarts.
+                Include(p => p.ProductsInShoppingCart);
+            return await query.ToArrayAsync();
+        }
+
+        public  ShoppingCart GetShoppingCartByUserAsync(int userId)
+        {
+            _logger.LogInformation($"Getting a Shopping Cart for user:  {userId}");
+
+
+            IQueryable<ShoppingCart> query = _context.ShoppingCarts.Where(c => c.UserId == userId)
+                                                                          .Include(p => p.ProductsInShoppingCart);
+
+            return query.FirstOrDefault();
+        }
+
+        public Task<ShoppingCart> GetShoppingCartByIdAsync(int id)
+        {
+            _logger.LogInformation($"Getting a Shopping Cart for Id:  {id}");
+            IQueryable<ShoppingCart> query = _context.ShoppingCarts.Where(c => c.ShoppingCartId == id)
+                                                                           .Include(p => p.ProductsInShoppingCart);
+                                                                           
+            return query.FirstOrDefaultAsync();
+        }
+
+        public Task<ProductShoppingCart> GetProductShoppingCartAsyn(int shoppingCartId, int productId)
+        {
+            _logger.LogInformation($"Getting a product in the Shopping Cart for ProductId:  {productId} and shoppingCartId: {shoppingCartId}");
+            IQueryable<ProductShoppingCart> query = _context.productsShoppingCarts.Where(p => p.ShoppingCartId == shoppingCartId && p.ProductId == productId).Include(p =>p.Product);
+                                                                           
+            return query.FirstOrDefaultAsync();
+        }
+        
+        public Task<ProductShoppingCart[]> GetProductShoppingCartByShoppingCartIdAsyn(int shoppingCartId)
+        {
+            _logger.LogInformation($"Getting a product in the Shopping Cart for  shoppingCartId: {shoppingCartId}");
+            IQueryable<ProductShoppingCart> query = _context.productsShoppingCarts.Where(p => p.ShoppingCartId == shoppingCartId ).Include(p=> p.Product);
+
+            return query.ToArrayAsync();
+        }
+
+        //ProductShoppingCart
+        public Task<ProductShoppingCart[]> GetAllProductShoppingCartAsync()
+        {
+            _logger.LogInformation($"Getting all ProductShoppingCart");
+            IQueryable<ProductShoppingCart> query = _context.productsShoppingCarts.Include(p => p.Product);
+
+            return query.ToArrayAsync();
+        }
+
+        public Task<ProductShoppingCart> GetProductShoppingCartByProductShoppingCartIdAsyn(int productShoppingCartId)
+        {
+            _logger.LogInformation($"Getting a  ProductShoppingCart for  ProductShoppingCartId: {productShoppingCartId}");
+            IQueryable<ProductShoppingCart> query = _context.productsShoppingCarts.Where(s => s.ProductShoppingCartId == productShoppingCartId).Include(p => p.Product);
+
+            return query.FirstOrDefaultAsync();
+        }
+
+        public void ClearProductShoppingCartCart(int shoppingCartId)
+        {
+
+            var productShoppingCartItems = _context.productsShoppingCarts.Where(s => s.ShoppingCartId == shoppingCartId);
+            _context.RemoveRange(productShoppingCartItems);
+            // _context.SaveChanges();
+
+        }
+
     }
 }

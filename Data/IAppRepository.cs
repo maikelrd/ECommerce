@@ -46,7 +46,7 @@ namespace ECommerce.Data
         Task<User> GetUserByNameAsync(string name);
         Task<User> GetUserByEmailAsync(string email);
 
-        //ShoppingCart
+        //ShoppingCart old
         Task<ShoppingCartItem[]> GetAllCartsAsync();        
         //Task<IActionResult> ClearCart(int id);
         Task<ShoppingCartItem> GetCartByIdAsync(int id);
@@ -61,6 +61,18 @@ namespace ECommerce.Data
         ShoppingCartItem GetCartByProduct(Product product);
         //ShoppingCartItem GetCartById(int id);
         ShoppingCartItem GetCartByNotProduct(Product product, int userId);
+
+        //shoppingCart New
+        Task<ShoppingCart[]> GetAllShoppingCartsAsync();
+        ShoppingCart GetShoppingCartByUserAsync(int userId);
+        Task<ShoppingCart> GetShoppingCartByIdAsync(int id);
+        Task<ProductShoppingCart> GetProductShoppingCartAsyn(int shoppingCartId, int productId);
+        Task<ProductShoppingCart[]> GetProductShoppingCartByShoppingCartIdAsyn(int shoppingCartId);
+
+        //ProductShoppingCart
+        Task<ProductShoppingCart[]> GetAllProductShoppingCartAsync();
+        Task<ProductShoppingCart> GetProductShoppingCartByProductShoppingCartIdAsyn(int productShoppingCartId);
+        void ClearProductShoppingCartCart(int shoppingCartId);
 
     }
 }

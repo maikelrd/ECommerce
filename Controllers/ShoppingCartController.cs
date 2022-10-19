@@ -188,13 +188,13 @@ namespace ECommerce.Controllers
             return BadRequest("Failed to delete the ShoppingCart Item");
         }
         
-        [HttpDelete("email")]
+        [HttpDelete("userEmail")]
         
-        public async Task<IActionResult> Delete(string email)
+        public async Task<IActionResult> Delete(string userEmail)
         {
             try
             {
-                var user = await _repository.GetUserByEmailAsync(email);
+                var user = await _repository.GetUserByEmailAsync(userEmail);
                 if (user == null)
                 {
                     return NotFound("Invalid user to clear shoppingcart");
