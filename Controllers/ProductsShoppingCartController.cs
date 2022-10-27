@@ -69,8 +69,40 @@ namespace ECommerce.Controllers
             }
         }
 
+        [HttpGet("userEmail")]
+        public async Task<ActionResult<ProductShoppingCartModel[]>> Get(string userEmail)
+        {
+            try
+            {
+                var user = await _repository.GetUserByEmailAsync(userEmail);
+                if (user == null)
+                {
+                    return NotFound("Invalid user to return shopping cart");
+                }
+                var result = _repository.GetShoppingCartByUserAsync(user.UserId);
+                if (result == null)
+                {
+                    return BadRequest($"There's not shopping Cart for this user: {userEmail}");
+                }
+
+                var results = await _repository.GetProductShoppingCartByShoppingCartIdAsyn(result.ShoppingCartId);
+                if (results == null)
+                {
+                    return NotFound($"There is not ProductShoppingCart for ProductShoppinCartId: {result.ShoppingCartId}");
+                }
+                var temp= _mapper.Map<ProductShoppingCartModel[]>(results);
+                return temp;
+            }
+            catch (Exception ex)
+            {
+
+                Console.WriteLine(ex);
+                return this.StatusCode(StatusCodes.Status500InternalServerError, "Database Failure");
+            }
+        }
+
         [HttpPut("{id}")]
-        public async Task<ActionResult<ProductShoppingCartModel>> Put(int id, int Quantity)
+        public async Task<ActionResult<ProductShoppingCartModel>> Put(int id, ProductShoppingCartModel productShoppingCartModel)
         {
             try
             {
@@ -79,7 +111,7 @@ namespace ECommerce.Controllers
                 {
                     return NotFound($"There is not ProductShoppingCart for ProductShoppinCartId: {id}");
                 }
-                result.Quantity = Quantity;
+                result.Quantity = productShoppingCartModel.Quantity;
                 if (await _repository.SaveChangesAsync())
                 {
                     return _mapper.Map<ProductShoppingCartModel>(result);

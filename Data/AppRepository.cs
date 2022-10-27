@@ -378,23 +378,24 @@ namespace ECommerce.Data
             return query.FirstOrDefaultAsync();
         }
 
+
+
+        //ProductShoppingCart
         public Task<ProductShoppingCart> GetProductShoppingCartAsyn(int shoppingCartId, int productId)
         {
             _logger.LogInformation($"Getting a product in the Shopping Cart for ProductId:  {productId} and shoppingCartId: {shoppingCartId}");
-            IQueryable<ProductShoppingCart> query = _context.productsShoppingCarts.Where(p => p.ShoppingCartId == shoppingCartId && p.ProductId == productId).Include(p =>p.Product);
-                                                                           
+            IQueryable<ProductShoppingCart> query = _context.productsShoppingCarts.Where(p => p.ShoppingCartId == shoppingCartId && p.ProductId == productId).Include(p => p.Product);
+
             return query.FirstOrDefaultAsync();
         }
-        
+
         public Task<ProductShoppingCart[]> GetProductShoppingCartByShoppingCartIdAsyn(int shoppingCartId)
         {
             _logger.LogInformation($"Getting a product in the Shopping Cart for  shoppingCartId: {shoppingCartId}");
-            IQueryable<ProductShoppingCart> query = _context.productsShoppingCarts.Where(p => p.ShoppingCartId == shoppingCartId ).Include(p=> p.Product);
+            IQueryable<ProductShoppingCart> query = _context.productsShoppingCarts.Where(s => s.ShoppingCartId == shoppingCartId).Include(p => p.Product);
 
             return query.ToArrayAsync();
         }
-
-        //ProductShoppingCart
         public Task<ProductShoppingCart[]> GetAllProductShoppingCartAsync()
         {
             _logger.LogInformation($"Getting all ProductShoppingCart");
@@ -411,6 +412,7 @@ namespace ECommerce.Data
             return query.FirstOrDefaultAsync();
         }
 
+      
         public void ClearProductShoppingCartCart(int shoppingCartId)
         {
 
@@ -418,7 +420,7 @@ namespace ECommerce.Data
             _context.RemoveRange(productShoppingCartItems);
             // _context.SaveChanges();
 
-        }
+        }      
 
     }
 }

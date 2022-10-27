@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -36,6 +37,9 @@ namespace ECommerce
         {          
             services.AddDbContext<AppDbContext>(options =>
             options.UseSqlServer(Configuration.GetConnectionString("ECommerce")));
+            services.AddDbContext<UserDbContext>(options =>
+                 options.UseSqlServer(Configuration.GetConnectionString("UsersConnection")));
+            services.AddIdentity<UsersEcommerce, IdentityRole>(opt => { }).AddEntityFrameworkStores<UserDbContext>();
             services.AddScoped<IAppRepository, AppRepository>();
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
 

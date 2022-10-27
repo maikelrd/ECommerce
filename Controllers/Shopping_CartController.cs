@@ -3,6 +3,7 @@ using ECommerce.Data;
 using ECommerce.Data.Entities;
 using ECommerce.Model;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using System;
@@ -16,57 +17,61 @@ namespace ECommerce.Controllers
     [ApiController]
     public class Shopping_CartController : ControllerBase
     {
+        private readonly UserManager<UsersEcommerce> _userManager;
         private readonly IAppRepository _repository;
         private readonly IMapper _mapper;
         private readonly LinkGenerator _linkGenerator;
-        public Shopping_CartController(IAppRepository repository, IMapper mapper, LinkGenerator linkGenerator)
+        public Shopping_CartController(UserManager<UsersEcommerce> userManager,IAppRepository repository, IMapper mapper, LinkGenerator linkGenerator)
         {
+            _userManager = userManager;
             _repository = repository;
             _mapper = mapper;
             _linkGenerator = linkGenerator;
         }
 
-        [HttpGet]
-        public async Task<ActionResult<Shopping_CartModel[]>> Get()
-        {
-            try
-            {
-                var results = await _repository.GetAllShoppingCartsAsync();
-                return _mapper.Map<Shopping_CartModel[]>(results);
+        //[HttpGet]
+        //public async Task<ActionResult<Shopping_CartModel[]>> Get()
+        //{
+        //    try
+        //    {
+        //        var results = await _repository.GetAllShoppingCartsAsync();
+        //        return _mapper.Map<Shopping_CartModel[]>(results);
 
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-                return this.StatusCode(StatusCodes.Status500InternalServerError, "Database Failure");
-            }
-        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.WriteLine(ex);
+        //        return this.StatusCode(StatusCodes.Status500InternalServerError, "Database Failure");
+        //    }
+        //}
 
-        [HttpGet("id")]
-        public async Task<ActionResult<Shopping_CartModel>> Get(int  id)
-        {
-            try
-            {
-                var result = await _repository.GetShoppingCartByIdAsync(id);
-                if (result == null)
-                {
-                    return NotFound("Invalid id to return shopping cart");
-                }
+        //[HttpGet("id")]
+        //public async Task<ActionResult<Shopping_CartModel>> Get(int  id)
+        //{
+        //    try
+        //    {
+        //        var result = await _repository.GetShoppingCartByIdAsync(id);
+        //        if (result == null)
+        //        {
+        //            return NotFound("Invalid id to return shopping cart");
+        //        }
                 
-                return _mapper.Map<Shopping_CartModel>(result);
-            }
-            catch (Exception)
-            {
+        //        return _mapper.Map<Shopping_CartModel>(result);
+        //    }
+        //    catch (Exception)
+        //    {
 
-                return this.StatusCode(StatusCodes.Status500InternalServerError, "Database Failure");
-            }
-        }
+        //        return this.StatusCode(StatusCodes.Status500InternalServerError, "Database Failure");
+        //    }
+        //}
 
         [HttpGet("userEmail")]
-        public async Task<ActionResult<Shopping_CartModel[]>> Get(string userEmail)
+        public async Task<ActionResult<Shopping_CartModel>> Get(string userEmail)
         {
             try
             {
+               // var appUser = await _userManager.FindByEmailAsync(userEmail);
+                
                 var user = await _repository.GetUserByEmailAsync(userEmail);
                 if (user == null)
                 {
@@ -77,7 +82,38 @@ namespace ECommerce.Controllers
                 {
                     return BadRequest($"There's not shopping Cart for this user: {userEmail}");
                 }
-                return _mapper.Map<Shopping_CartModel[]>(results);
+
+                var productsShoppingCart = await _repository.GetProductShoppingCartByShoppingCartIdAsyn(results.ShoppingCartId);
+               // List<ProductInShoppingCart> productsShopping_Cart = new List<ProductInShoppingCart>();
+
+                //                var shopping_Cart = new Shopping_Cart
+                //                {
+                //                    ShoppingCartId = results.ShoppingCartId,
+                //                    UserEmail = user.Email
+                ////ProductsInShoppingCart =
+                //                };
+                Shopping_Cart shopping_Cart = new Shopping_Cart();
+                shopping_Cart.ShoppingCartId = results.ShoppingCartId;
+                shopping_Cart.UserEmail = user.Email;
+
+                List<ProductInShoppingCart> ProductsInShoppingCart = new List<ProductInShoppingCart>();
+
+                for (int i = 0; i < productsShoppingCart.Length; i++)
+                {
+                    ProductInShoppingCart productInShoppingCart = new ProductInShoppingCart();
+                    productInShoppingCart.ProductShoppingCart = productsShoppingCart[i].Product;
+                    productInShoppingCart.Quantity = productsShoppingCart[i].Quantity;
+                  //  var prueba = productInShoppingCart;
+                    ProductsInShoppingCart.Add(productInShoppingCart);
+                    results.ProductsInShoppingCart[i].Product= productsShoppingCart[i].Product;
+                    results.ProductsInShoppingCart[i].Quantity= productsShoppingCart[i].Quantity;
+
+                    
+                }
+
+                shopping_Cart.ProductsInShoppingCart = ProductsInShoppingCart;
+               
+                return _mapper.Map<Shopping_CartModel>(shopping_Cart);
             }
             catch (Exception ex)
             {
