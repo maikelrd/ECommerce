@@ -59,7 +59,7 @@ namespace ECommerce.Controllers
                 List<Product> productsBypage = new List<Product>();
                 for (int i = 0; i < results.Length; i++)
                 {
-                    if ((i >= page * 10) && (i < page * 10 + 10))
+                    if ((i >= page * 10) && (i < page * 10 + 10))    
                     {
                         productsBypage.Add(results[i]);
                     }
