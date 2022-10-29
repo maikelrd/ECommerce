@@ -74,12 +74,14 @@ namespace ECommerce.Controllers
         {
             try
             {
-                var user = await _repository.GetUserByEmailAsync(userEmail);
+                // var user = await _repository.GetUserByEmailAsync(userEmail);
+                var user = await _repository.GetUserAspNetByEmailAsync(userEmail);
                 if (user == null)
                 {
                     return NotFound("Invalid user to return shopping cart");
                 }
-                var result = _repository.GetShoppingCartByUserAsync(user.UserId);
+                 var result = _repository.GetShoppingCartByUserAsync(user.Id);
+                //var result = _repository.ge
                 if (result == null)
                 {
                     return BadRequest($"There's not shopping Cart for this user: {userEmail}");
@@ -163,13 +165,14 @@ namespace ECommerce.Controllers
             try
             {
 
-                var user = await _repository.GetUserByEmailAsync(userEmail);
+                //var user = await _repository.GetUserByEmailAsync(userEmail);
+                var user = await _repository.GetUserAspNetByEmailAsync(userEmail);
                 if (user == null)
                 {
                     return NotFound($"Invalid user to return delete ProductShoppingCart para el userEmail: {userEmail}");
                 }
 
-                var shoppingCart = _repository.GetShoppingCartByUserAsync(user.UserId);
+                var shoppingCart = _repository.GetShoppingCartByUserAsync(user.Id);
                 if (shoppingCart == null)
                 {
                     return NotFound("Invalid user to return a ShoppingCart");

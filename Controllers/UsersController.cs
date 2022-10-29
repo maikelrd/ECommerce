@@ -28,8 +28,9 @@ namespace ECommerce.Controllers
         //private readonly IAppRepository _repository;
         private readonly IMapper _mapper;
         private readonly LinkGenerator _linkGenerator;
+        private readonly IAppRepository _repository;
 
-        public UsersController(IConfiguration configuration,UserManager<UsersEcommerce> userManager,SignInManager<UsersEcommerce> signInManager, IMapper mapper, LinkGenerator linkGenerator)
+        public UsersController(IConfiguration configuration,UserManager<UsersEcommerce> userManager,SignInManager<UsersEcommerce> signInManager, IMapper mapper, LinkGenerator linkGenerator, IAppRepository repository)
         {
             _configuration = configuration;
             _userManager = userManager;
@@ -37,6 +38,7 @@ namespace ECommerce.Controllers
             //_repository = repository;
             _mapper = mapper;
             _linkGenerator = linkGenerator;
+            _repository = repository;
         }
 
         [HttpPost("RegisterUser")]
@@ -50,6 +52,7 @@ namespace ECommerce.Controllers
                 if (result.Succeeded)
                 {
                     var appUser = await _userManager.FindByEmailAsync(userModel.Email);
+                    //var appuser1 = await _repository.GetUserAspNetByIdAsync(appUser.Id);
                     var registerModel = new RegisterModel(appUser.FirstName, appUser.Email);
                     return await Task.FromResult(registerModel);
                 }

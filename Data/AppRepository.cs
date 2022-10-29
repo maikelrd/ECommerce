@@ -1,4 +1,5 @@
 ﻿using ECommerce.Data.Entities;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -11,10 +12,14 @@ namespace ECommerce.Data
 {
     public class AppRepository : IAppRepository
     {
+        private readonly UserManager<UsersEcommerce> _userManager;
+        private readonly SignInManager<UsersEcommerce> _signInManager;
         private readonly AppDbContext _context;
         private readonly ILogger<AppRepository> _logger;
-        public AppRepository(AppDbContext context, ILogger<AppRepository> logger)
+        public AppRepository(UserManager<UsersEcommerce> userManager, SignInManager<UsersEcommerce> signInManager, AppDbContext context, ILogger<AppRepository> logger)
         {
+            _userManager = userManager;
+            _signInManager = signInManager;
             _context = context;
             _logger = logger;
         }
@@ -247,32 +252,55 @@ namespace ECommerce.Data
         }
 
         //Users
-        public async Task<User[]> GetAllUserAsync()
-        {
-            _logger.LogInformation($"Getting all Users");
-            IQueryable<User> query = _context.Users.OrderByDescending(u => u.FirstName);
-            return await query.ToArrayAsync();
-        }
+        ////public async Task<User[]> GetAllUserAsync()
+        ////{
+        ////    _logger.LogInformation($"Getting all Users");
+        ////    IQueryable<User> query = _context.Users.OrderByDescending(u => u.FirstName);
+        ////    return await query.ToArrayAsync();
+        ////}
 
-        public async Task<User> GetUserByIdAsync(int id)
+        //erase below
+        //public async Task<User> GetUserByIdAsync(int id)
+        //{
+        //    _logger.LogInformation($"Getting a User for {id}");
+        //    IQueryable<User> query = _context.Users.Where(u => u.UserId == id);
+        //    return await query.FirstOrDefaultAsync();
+        //}
+
+        public async Task<UsersEcommerce> GetUserAspNetByIdAsync(string id)
         {
             _logger.LogInformation($"Getting a User for {id}");
-            IQueryable<User> query = _context.Users.Where(u => u.UserId == id);
-            return await query.FirstOrDefaultAsync();
+           var query = _userManager.FindByIdAsync(id);
+            return await query;
         }
 
-        public async Task<User> GetUserByNameAsync(string name)
+        //erase below
+        //public async Task<User> GetUserByNameAsync(string name)
+        //{
+        //    _logger.LogInformation($"Getting a User for {name}");
+        //    IQueryable<User> query = _context.Users.Where(u => u.FirstName == name);
+        //    return await query.FirstOrDefaultAsync();
+        //}
+
+        public async Task<UsersEcommerce> GetUserAspNetByNameAsync(string name)
         {
             _logger.LogInformation($"Getting a User for {name}");
-            IQueryable<User> query = _context.Users.Where(u => u.FirstName == name);
-            return await query.FirstOrDefaultAsync();
+            var query = _userManager.FindByNameAsync(name); //_context.Users.Where(u => u.FirstName == name);
+            return  await query;
         }
 
-        public async Task<User> GetUserByEmailAsync(string email)
+        //public async Task<User> GetUserByEmailAsync(string email)
+        //{
+        //    _logger.LogInformation($"Getting a User for {email}");
+        //    IQueryable<User> query = _context.Users.Where(u => u.Email == email);
+        //    return await query.FirstOrDefaultAsync();
+        //}
+
+        public async Task<UsersEcommerce> GetUserAspNetByEmailAsync(string email)
         {
             _logger.LogInformation($"Getting a User for {email}");
-            IQueryable<User> query = _context.Users.Where(u => u.Email == email);
-            return await query.FirstOrDefaultAsync();
+            var query = _userManager.FindByEmailAsync(email); //_context.Users.Where(u => u.Email == email);
+            return await query;
         }
 
         //ShoppingCarts old
@@ -358,13 +386,14 @@ namespace ECommerce.Data
             return await query.ToArrayAsync();
         }
 
-        public  ShoppingCart GetShoppingCartByUserAsync(int userId)
+       // public  ShoppingCart GetShoppingCartByUserAsync(int userId
+        public  ShoppingCart GetShoppingCartByUserAsync(string userId)
         {
             _logger.LogInformation($"Getting a Shopping Cart for user:  {userId}");
 
 
-            IQueryable<ShoppingCart> query = _context.ShoppingCarts.Where(c => c.UserId == userId)
-                                                                          .Include(p => p.ProductsInShoppingCart);
+            IQueryable<ShoppingCart> query = _context.ShoppingCarts.Where(c => c.UserId == userId);
+                                                                         // .Include(p => p.ProductsInShoppingCart);
 
             return query.FirstOrDefault();
         }

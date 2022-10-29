@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ECommerce.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20221004201820_initial")]
+    [Migration("20221029190508_initial")]
     partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -119,6 +119,46 @@ namespace ECommerce.Migrations
                     b.ToTable("Products");
                 });
 
+            modelBuilder.Entity("ECommerce.Data.Entities.ProductShoppingCart", b =>
+                {
+                    b.Property<int>("ProductShoppingCartId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ShoppingCartId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ProductShoppingCartId");
+
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("ShoppingCartId");
+
+                    b.ToTable("productsShoppingCarts");
+                });
+
+            modelBuilder.Entity("ECommerce.Data.Entities.ShoppingCart", b =>
+                {
+                    b.Property<int>("ShoppingCartId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ShoppingCartId");
+
+                    b.ToTable("ShoppingCarts");
+                });
+
             modelBuilder.Entity("ECommerce.Data.Entities.ShoppingCartItem", b =>
                 {
                     b.Property<int>("ShoppingCartItemId")
@@ -195,6 +235,23 @@ namespace ECommerce.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("ECommerce.Data.Entities.ProductShoppingCart", b =>
+                {
+                    b.HasOne("ECommerce.Data.Entities.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ECommerce.Data.Entities.ShoppingCart", null)
+                        .WithMany("ProductsInShoppingCart")
+                        .HasForeignKey("ShoppingCartId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+                });
+
             modelBuilder.Entity("ECommerce.Data.Entities.ShoppingCartItem", b =>
                 {
                     b.HasOne("ECommerce.Data.Entities.Product", "Product")
@@ -227,6 +284,11 @@ namespace ECommerce.Migrations
             modelBuilder.Entity("ECommerce.Data.Entities.Product", b =>
                 {
                     b.Navigation("Images");
+                });
+
+            modelBuilder.Entity("ECommerce.Data.Entities.ShoppingCart", b =>
+                {
+                    b.Navigation("ProductsInShoppingCart");
                 });
 #pragma warning restore 612, 618
         }

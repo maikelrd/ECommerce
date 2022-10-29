@@ -41,10 +41,13 @@ namespace ECommerce.Data
         Task<Product[]> GetProductsByCategoryFilter(int categoryId,string filterBy);
 
         //User
-        Task<User[]> GetAllUserAsync();
-        Task<User> GetUserByIdAsync(int id);
-        Task<User> GetUserByNameAsync(string name);
-        Task<User> GetUserByEmailAsync(string email);
+      //  Task<User[]> GetAllUserAsync();
+       // Task<User> GetUserByIdAsync(int id);
+        Task<UsersEcommerce> GetUserAspNetByIdAsync(string id);
+      //  Task<User> GetUserByNameAsync(string name);
+        Task<UsersEcommerce> GetUserAspNetByNameAsync(string name);
+      //  Task<User> GetUserByEmailAsync(string email);
+        Task<UsersEcommerce> GetUserAspNetByEmailAsync(string email);
 
         //ShoppingCart old
         Task<ShoppingCartItem[]> GetAllCartsAsync();        
@@ -64,7 +67,7 @@ namespace ECommerce.Data
 
         //shoppingCart New
         Task<ShoppingCart[]> GetAllShoppingCartsAsync();
-        ShoppingCart GetShoppingCartByUserAsync(int userId);
+        ShoppingCart GetShoppingCartByUserAsync(string userId);
         Task<ShoppingCart> GetShoppingCartByIdAsync(int id);
         Task<ProductShoppingCart> GetProductShoppingCartAsyn(int shoppingCartId, int productId);
         Task<ProductShoppingCart[]> GetProductShoppingCartByShoppingCartIdAsyn(int shoppingCartId);

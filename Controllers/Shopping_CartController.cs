@@ -70,14 +70,15 @@ namespace ECommerce.Controllers
         {
             try
             {
-               // var appUser = await _userManager.FindByEmailAsync(userEmail);
-                
-                var user = await _repository.GetUserByEmailAsync(userEmail);
+                // var appUser = await _userManager.FindByEmailAsync(userEmail);
+
+                // var user = await _repository.GetUserByEmailAsync(userEmail);
+                var user = await _repository.GetUserAspNetByEmailAsync(userEmail);
                 if (user == null)
                 {
                     return NotFound("Invalid user to return shopping cart");
                 }
-                var results =  _repository.GetShoppingCartByUserAsync(user.UserId);
+                var results =  _repository.GetShoppingCartByUserAsync(user.Id);
                 if (results == null)
                 {
                     return BadRequest($"There's not shopping Cart for this user: {userEmail}");
@@ -127,20 +128,21 @@ namespace ECommerce.Controllers
         {
             try
             {
-                var user = await _repository.GetUserByEmailAsync(shopping_CartModel.UserEmail);
+                // var user = await _repository.GetUserByEmailAsync(shopping_CartModel.UserEmail);
+                var user = await _repository.GetUserAspNetByEmailAsync(shopping_CartModel.UserEmail);
                 if (user == null)
                 {
                     return BadRequest($"Incorrect user email: {shopping_CartModel.UserEmail}");
                 }
 
-                var shoppingCart = _repository.GetShoppingCartByUserAsync(user.UserId);
+                var shoppingCart = _repository.GetShoppingCartByUserAsync(user.Id);
                 if (shoppingCart == null)
                 {
-                    
-                      shoppingCart = new ShoppingCart
+
+                    shoppingCart = new ShoppingCart
                     {
-                        ShoppingCartId = 0,                       
-                        UserId = user.UserId                   
+                        ShoppingCartId = 0,
+                        UserId = user.Id                  
                     };
                     _repository.Add(shoppingCart);
                     await _repository.SaveChangesAsync();                    
@@ -181,7 +183,7 @@ namespace ECommerce.Controllers
                     Shopping_Cart shopping_Cart = new Shopping_Cart();                  
                     // shoppingCart = _repository.GetShoppingCartByUserAsync(user.UserId);
                     shopping_Cart.ShoppingCartId = shoppingCart.ShoppingCartId;
-                    shopping_Cart.UserEmail = shoppingCart.User.Email;
+                  //  shopping_Cart.UserEmail = shoppingCart.User.Email;
                     var productsShoppingCart = await _repository.GetProductShoppingCartByShoppingCartIdAsyn(shoppingCart.ShoppingCartId);
                     
                     List<ProductInShoppingCart> products = new List<ProductInShoppingCart>();
@@ -219,13 +221,14 @@ namespace ECommerce.Controllers
             try
             {
 
-                var user = await _repository.GetUserByEmailAsync(userEmail);
+                // var user = await _repository.GetUserByEmailAsync(userEmail);
+                var user = await _repository.GetUserAspNetByEmailAsync(userEmail);
                 if (user == null)
                 {
                     return NotFound($"Invalid user to  delete ShoppingCart para el userEmail: {userEmail}");
                 }
 
-                var shoppingCart = _repository.GetShoppingCartByUserAsync(user.UserId);
+                var shoppingCart = _repository.GetShoppingCartByUserAsync(user.Id);
                 if (shoppingCart == null)
                 {
                     return NotFound("Invalid user to return a ShoppingCart");
