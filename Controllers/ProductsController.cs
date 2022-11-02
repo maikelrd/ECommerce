@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Azure.Storage;
+using Microsoft.Azure.Storage.Blob;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -19,6 +21,12 @@ namespace ECommerce.Controllers
     [ApiController]
     public class ProductsController : ControllerBase
     {
+        CloudStorageAccount cloudStorageAccount =
+            CloudStorageAccount.Parse("DefaultEndpointsProtocol=https;AccountName=imagesecommerce;" +
+                "AccountKey=30xShm+9Uur79DoHK7dGd0DcdfGykBYp6b7V8nFn5oQVcoDNrgIP/FlOesI7p9PwhWQTmY3fAjfz+AStqjtWXw==;" +
+                "EndpointSuffix=core.windows.net");
+
+
         private readonly IAppRepository _repository;
         private readonly IMapper _mapper;
         private readonly LinkGenerator _linkGenerator;
@@ -77,14 +85,14 @@ namespace ECommerce.Controllers
                 }
 
                 var product = _mapper.Map<Product>(productModel);
-                _repository.Add(product);
-                if (await _repository.SaveChangesAsync())
+                //_repository.Add(product);
+                //if (await _repository.SaveChangesAsync())
 
-                {
-                    //productImages.ProductId = product.ProductId;
-                    Console.WriteLine("creating new product");
+                //{
+                //    //productImages.ProductId = product.ProductId;
+                //    Console.WriteLine("creating new product");
 
-                }
+                //}
 
 
 
@@ -94,6 +102,7 @@ namespace ECommerce.Controllers
                 {
                     if (fileObj.ImageFile[i].Length > 0)
                     {
+                        await UploadToAzureAsync(fileObj.ImageFile[i]);
                         using (var ms = new MemoryStream())
                         {
                             fileObj.ImageFile[i].CopyTo(ms);
@@ -106,13 +115,14 @@ namespace ECommerce.Controllers
 
                         var image = _mapper.Map<Image>(ImageModel);
                         image.ProductId = product.ProductId;
-                        _repository.Add(image);
-                        if (await _repository.SaveChangesAsync())
-                        {
-                            Console.WriteLine("Saving Image in database");
-                            // productModel.ImageId = image.Id;
-                            // productModel.Image = null;
-                        }
+                     
+                        //_repository.Add(image);
+                        //if (await _repository.SaveChangesAsync())
+                        //{
+                        //    Console.WriteLine("Saving Image in database");
+                        //    // productModel.ImageId = image.Id;
+                        //    // productModel.Image = null;
+                        //}
 
                        
                     }
@@ -133,6 +143,35 @@ namespace ECommerce.Controllers
                 return this.StatusCode(StatusCodes.Status500InternalServerError, "Database Failure");
             }
            // return BadRequest();
+        }
+
+        private async Task UploadToAzureAsync(IFormFile formFile)
+        {
+            var cloudBlobClient =
+                cloudStorageAccount.CreateCloudBlobClient();
+
+            var cloudBlobContainer =
+                cloudBlobClient.GetContainerReference("imagesecommerce");
+            if (await cloudBlobContainer.CreateIfNotExistsAsync())
+            {
+                await cloudBlobContainer.SetPermissionsAsync(new
+                    BlobContainerPermissions { PublicAccess =
+                    BlobContainerPublicAccessType.Off });
+            }
+
+            var cloudBlockBlob =
+                cloudBlobContainer.GetBlockBlobReference(formFile.FileName);
+                cloudBlockBlob.Properties.ContentType = formFile.ContentType;
+             await cloudBlockBlob.UploadFromStreamAsync(formFile.OpenReadStream());
+
+            var url = cloudBlockBlob.Uri.ToString();
+
+            ////create or overwrite the blob with the contents of a local file
+            //using (var fileStream = formFile.OpenReadStream())
+            //{
+            //    await cloudBlockBlob.UploadFromStreamAsync(fileStream);
+            //};
+            
         }
 
         [HttpPut("{id}")]

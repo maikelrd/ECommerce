@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -82,7 +83,7 @@ namespace ECommerce.Controllers
                         var appUser = await _userManager.FindByEmailAsync(model.Email);
                         var user = new UserDTO(appUser.FirstName, appUser.Email);
                         user.IsAuthenticated = true;
-                        user.Token = GenerateToken(user);
+                        user.Token = GenerateToken(appUser);
                         return await Task.FromResult(user);
                     }              
 
@@ -97,17 +98,27 @@ namespace ECommerce.Controllers
             }
         }
 
-        private string GenerateToken(UserDTO user)
+        private string GenerateToken(UsersEcommerce user)
         {
             //var jwtTokenHandler = new JwtSecurityTokenHandler();
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
             //Create satandard JWT claims
-            //Create the JwtSecurityToken pbject
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, user.UserName),
+                new Claim(ClaimTypes.NameIdentifier, user.Id),
+                new Claim(JwtRegisteredClaimNames. Nbf, new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds().ToString()),
+                new Claim(JwtRegisteredClaimNames.Exp, new DateTimeOffset(DateTime.Now.AddDays(1)).ToUnixTimeSeconds().ToString())
+            };
+            //Create the JwtSecurityToken object
             var token = new JwtSecurityToken(
-                issuer: _configuration["Jwt:Issuer"],
-                audience: _configuration["Jwt:Audience"],
-                expires: DateTime.Now.AddMinutes(60),
-                signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256));
+                new JwtHeader(
+                    new SigningCredentials(key, SecurityAlgorithms.HmacSha256)),
+                new JwtPayload(claims));
+                ////issuer: _configuration["Jwt:Issuer"],
+                ////audience: _configuration["Jwt:Audience"],
+               // expires: DateTime.Now.AddMinutes(60),
+               // signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256));
 
             //Create a string representation of the Jwt token
             return new JwtSecurityTokenHandler().WriteToken(token);

@@ -2,6 +2,7 @@
 using ECommerce.Data;
 using ECommerce.Data.Entities;
 using ECommerce.Model;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -15,6 +16,7 @@ namespace ECommerce.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+  //  [Authorize]
     public class Shopping_CartController : ControllerBase
     {
         private readonly UserManager<UsersEcommerce> _userManager;
@@ -29,50 +31,14 @@ namespace ECommerce.Controllers
             _linkGenerator = linkGenerator;
         }
 
-        //[HttpGet]
-        //public async Task<ActionResult<Shopping_CartModel[]>> Get()
-        //{
-        //    try
-        //    {
-        //        var results = await _repository.GetAllShoppingCartsAsync();
-        //        return _mapper.Map<Shopping_CartModel[]>(results);
-
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Console.WriteLine(ex);
-        //        return this.StatusCode(StatusCodes.Status500InternalServerError, "Database Failure");
-        //    }
-        //}
-
-        //[HttpGet("id")]
-        //public async Task<ActionResult<Shopping_CartModel>> Get(int  id)
-        //{
-        //    try
-        //    {
-        //        var result = await _repository.GetShoppingCartByIdAsync(id);
-        //        if (result == null)
-        //        {
-        //            return NotFound("Invalid id to return shopping cart");
-        //        }
-                
-        //        return _mapper.Map<Shopping_CartModel>(result);
-        //    }
-        //    catch (Exception)
-        //    {
-
-        //        return this.StatusCode(StatusCodes.Status500InternalServerError, "Database Failure");
-        //    }
-        //}
+       
 
         [HttpGet("userEmail")]
         public async Task<ActionResult<Shopping_CartModel>> Get(string userEmail)
         {
             try
             {
-                // var appUser = await _userManager.FindByEmailAsync(userEmail);
-
-                // var user = await _repository.GetUserByEmailAsync(userEmail);
+                
                 var user = await _repository.GetUserAspNetByEmailAsync(userEmail);
                 if (user == null)
                 {
@@ -85,14 +51,7 @@ namespace ECommerce.Controllers
                 }
 
                 var productsShoppingCart = await _repository.GetProductShoppingCartByShoppingCartIdAsyn(results.ShoppingCartId);
-               // List<ProductInShoppingCart> productsShopping_Cart = new List<ProductInShoppingCart>();
-
-                //                var shopping_Cart = new Shopping_Cart
-                //                {
-                //                    ShoppingCartId = results.ShoppingCartId,
-                //                    UserEmail = user.Email
-                ////ProductsInShoppingCart =
-                //                };
+               
                 Shopping_Cart shopping_Cart = new Shopping_Cart();
                 shopping_Cart.ShoppingCartId = results.ShoppingCartId;
                 shopping_Cart.UserEmail = user.Email;
