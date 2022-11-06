@@ -19,6 +19,7 @@ namespace ECommerce.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class ProductsController : ControllerBase
     {
         CloudStorageAccount cloudStorageAccount =
@@ -85,46 +86,48 @@ namespace ECommerce.Controllers
                 }
 
                 var product = _mapper.Map<Product>(productModel);
-                //_repository.Add(product);
-                //if (await _repository.SaveChangesAsync())
+                _repository.Add(product);
+                if (await _repository.SaveChangesAsync())
 
-                //{
-                //    //productImages.ProductId = product.ProductId;
-                //    Console.WriteLine("creating new product");
+                {
+                    //productImages.ProductId = product.ProductId;
+                    Console.WriteLine("creating new product");
 
-                //}
+                }
 
 
 
-                ImageModel ImageModel = new ImageModel();
+                ImageModel imageModel = new ImageModel();
 
                 for (int i = 0; i < fileObj.ImageFile.Length; i++)
                 {
                     if (fileObj.ImageFile[i].Length > 0)
                     {
-                        await UploadToAzureAsync(fileObj.ImageFile[i]);
+                       // await UploadToAzureAsync(fileObj.ImageFile[i]);
                         using (var ms = new MemoryStream())
                         {
                             fileObj.ImageFile[i].CopyTo(ms);
                             var fileBytes = ms.ToArray();
                             var temp = Convert.ToBase64String(fileBytes);
-                            ImageModel.PicByte = temp;
+                            //ImageModel.PicByte = temp;
                         }
-                        ImageModel.Name = fileObj.ImageFile[i].FileName;
-                        ImageModel.Type = fileObj.ImageFile[i].ContentType;
+                        imageModel.Name = fileObj.ImageFile[i].FileName;
+                        imageModel.Type = fileObj.ImageFile[i].ContentType;
 
-                        var image = _mapper.Map<Image>(ImageModel);
+                        imageModel.Url = await UploadToAzureAsync(fileObj.ImageFile[i]);
+
+                        var image = _mapper.Map<Image>(imageModel);
                         image.ProductId = product.ProductId;
-                     
-                        //_repository.Add(image);
-                        //if (await _repository.SaveChangesAsync())
-                        //{
-                        //    Console.WriteLine("Saving Image in database");
-                        //    // productModel.ImageId = image.Id;
-                        //    // productModel.Image = null;
-                        //}
 
-                       
+                        _repository.Add(image);
+                        if (await _repository.SaveChangesAsync())
+                        {
+                            Console.WriteLine("Saving Image in database");
+                            // productModel.ImageId = image.Id;
+                            // productModel.Image = null;
+                        }
+
+
                     }
 
                 }
@@ -145,7 +148,7 @@ namespace ECommerce.Controllers
            // return BadRequest();
         }
 
-        private async Task UploadToAzureAsync(IFormFile formFile)
+        private async Task<string> UploadToAzureAsync(IFormFile formFile)
         {
             var cloudBlobClient =
                 cloudStorageAccount.CreateCloudBlobClient();
@@ -171,7 +174,7 @@ namespace ECommerce.Controllers
             //{
             //    await cloudBlockBlob.UploadFromStreamAsync(fileStream);
             //};
-            
+            return url;
         }
 
         [HttpPut("{id}")]

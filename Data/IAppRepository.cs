@@ -50,20 +50,20 @@ namespace ECommerce.Data
         Task<UsersEcommerce> GetUserAspNetByEmailAsync(string email);
 
         //ShoppingCart old
-        Task<ShoppingCartItem[]> GetAllCartsAsync();        
-        //Task<IActionResult> ClearCart(int id);
-        Task<ShoppingCartItem> GetCartByIdAsync(int id);
-         Task<ShoppingCartItem[]> GetCartsByUserAsync(int userId);
+        ////Task<ShoppingCartItem[]> GetAllCartsAsync();        
+        //////Task<IActionResult> ClearCart(int id);
+        ////Task<ShoppingCartItem> GetCartByIdAsync(int id);
+        //// Task<ShoppingCartItem[]> GetCartsByUserAsync(int userId);
         //Task<IActionResult> AddToCart(ShoppingCartItem shoppingCartItem);
         //Task<IActionResult> RemoveFromCart
         //Task ClearCart(string email);
-        public void ClearCart(int userId);
+       // public void ClearCart(int userId);
         // Task<decimal> GetShoppingCartTotal(User user);
         decimal GetShoppingCartTotal(int id);
 
-        ShoppingCartItem GetCartByProduct(Product product);
+       // ShoppingCartItem GetCartByProduct(Product product);
         //ShoppingCartItem GetCartById(int id);
-        ShoppingCartItem GetCartByNotProduct(Product product, int userId);
+       // ShoppingCartItem GetCartByNotProduct(Product product, int userId);
 
         //shoppingCart New
         Task<ShoppingCart[]> GetAllShoppingCartsAsync();

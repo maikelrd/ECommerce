@@ -103,22 +103,23 @@ namespace ECommerce.Controllers
             //var jwtTokenHandler = new JwtSecurityTokenHandler();
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
             //Create satandard JWT claims
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, user.UserName),
-                new Claim(ClaimTypes.NameIdentifier, user.Id),
-                new Claim(JwtRegisteredClaimNames. Nbf, new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds().ToString()),
-                new Claim(JwtRegisteredClaimNames.Exp, new DateTimeOffset(DateTime.Now.AddDays(1)).ToUnixTimeSeconds().ToString())
-            };
+            //var claims = new List<Claim>
+            //{
+            //    new Claim(ClaimTypes.Name, user.UserName),
+            //    new Claim(ClaimTypes.NameIdentifier, user.Id),
+            //    new Claim(JwtRegisteredClaimNames. Nbf, new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds().ToString()),
+            //    new Claim(JwtRegisteredClaimNames.Exp, new DateTimeOffset(DateTime.Now.AddDays(1)).ToUnixTimeSeconds().ToString())
+            //};
             //Create the JwtSecurityToken object
+            //var token = new JwtSecurityToken(
+            //    new JwtHeader(
+            //        new SigningCredentials(key, SecurityAlgorithms.HmacSha256)),
+            //    new JwtPayload(claims));
             var token = new JwtSecurityToken(
-                new JwtHeader(
-                    new SigningCredentials(key, SecurityAlgorithms.HmacSha256)),
-                new JwtPayload(claims));
-                ////issuer: _configuration["Jwt:Issuer"],
-                ////audience: _configuration["Jwt:Audience"],
-               // expires: DateTime.Now.AddMinutes(60),
-               // signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256));
+                issuer: _configuration["Jwt:Issuer"],
+                audience: _configuration["Jwt:Audience"],
+                 expires: DateTime.Now.AddMinutes(60),
+                 signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256));
 
             //Create a string representation of the Jwt token
             return new JwtSecurityTokenHandler().WriteToken(token);

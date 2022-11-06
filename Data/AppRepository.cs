@@ -304,33 +304,33 @@ namespace ECommerce.Data
         }
 
         //ShoppingCarts old
-        public async Task<ShoppingCartItem[]> GetAllCartsAsync()
-        {
-            _logger.LogInformation($"Getting all ShoppingCarts");
+        //public async Task<ShoppingCartItem[]> GetAllCartsAsync()
+        //{
+        //    _logger.LogInformation($"Getting all ShoppingCarts");
 
-            IQueryable<ShoppingCartItem> query = _context.ShoppingCartItems.
-                Include(p => p.Product);
-            return await query.ToArrayAsync();
-        }
+        //    IQueryable<ShoppingCartItem> query = _context.ShoppingCartItems.
+        //        Include(p => p.Product);
+        //    return await query.ToArrayAsync();
+        //}
 
-        public async Task<ShoppingCartItem[]> GetCartsByUserAsync(int userId)
-        {
-            _logger.LogInformation($"Getting a Shopping Cart for user:  {userId}");
+        //public async Task<ShoppingCartItem[]> GetCartsByUserAsync(int userId)
+        //{
+        //    _logger.LogInformation($"Getting a Shopping Cart for user:  {userId}");
 
 
-            IQueryable<ShoppingCartItem> query = _context.ShoppingCartItems.Where(c => c.UserId == userId)
-                                                                           .Include(p => p.Product);
+        //    IQueryable<ShoppingCartItem> query = _context.ShoppingCartItems.Where(c => c.UserId == userId)
+        //                                                                   .Include(p => p.Product);
 
-            return await query.ToArrayAsync();
-        }
+        //    return await query.ToArrayAsync();
+        //}
 
-        public   Task<ShoppingCartItem> GetCartByIdAsync(int id)
-        {
-            _logger.LogInformation($"Getting a Shopping Cart for Id:  {id}");
-            IQueryable<ShoppingCartItem> query = _context.ShoppingCartItems.Where(c => c.ShoppingCartItemId == id)
-                                                                           .Include(p => p.Product);
-            return  query.FirstOrDefaultAsync();
-        }
+        //public   Task<ShoppingCartItem> GetCartByIdAsync(int id)
+        //{
+        //    _logger.LogInformation($"Getting a Shopping Cart for Id:  {id}");
+        //    IQueryable<ShoppingCartItem> query = _context.ShoppingCartItems.Where(c => c.ShoppingCartItemId == id)
+        //                                                                   .Include(p => p.Product);
+        //    return  query.FirstOrDefaultAsync();
+        //}
 
         //public ShoppingCartItem GetCartById(int id)
         //{
@@ -340,32 +340,32 @@ namespace ECommerce.Data
         //    return query.FirstOrDefault();
         //}
 
-        public ShoppingCartItem GetCartByProduct(Product product)
-        {
-            var query = _context.ShoppingCartItems.Where(p => p.ProductId == product.ProductId).
-                Include(p =>p.Product);
-            return  query.FirstOrDefault();
-        }
-        public ShoppingCartItem GetCartByNotProduct(Product product, int userId)
-        {
-            var query = _context.ShoppingCartItems.Where(s => s.ProductId == product.ProductId && s.UserId == userId);
+        //public ShoppingCartItem GetCartByProduct(Product product)
+        //{
+        //    var query = _context.ShoppingCartItems.Where(p => p.ProductId == product.ProductId).
+        //        Include(p =>p.Product);
+        //    return  query.FirstOrDefault();
+        //}
+        //public ShoppingCartItem GetCartByNotProduct(Product product, int userId)
+        //{
+        //    var query = _context.ShoppingCartItems.Where(s => s.ProductId == product.ProductId && s.UserId == userId);
               
-            return query.FirstOrDefault();
-        }
+        //    return query.FirstOrDefault();
+        //}
         //public async Task<IActionResult> AddToCart(Product product)
         //{
         //    _logger.LogInformation($"Adding a product to the shopping cart");
         //    var query = _context.ShoppingCartItems.Where(s => s.Product.ProductId == product.ProductId)
         //    return await query.SingleOrDefaultAsync();
         //}
-        public void ClearCart(int userId)
-        {
+        //public void ClearCart(int userId)
+        //{
 
-            var cartItems = _context.ShoppingCartItems.Where(cart => cart.UserId == userId);
-            _context.RemoveRange(cartItems);
-            // _context.SaveChanges();
+        //    var cartItems = _context.ShoppingCartItems.Where(cart => cart.UserId == userId);
+        //    _context.RemoveRange(cartItems);
+        //    // _context.SaveChanges();
 
-        }
+        //}
 
         public decimal GetShoppingCartTotal(int userId)
         {

@@ -16,7 +16,7 @@ namespace ECommerce.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-  //  [Authorize]
+    [Authorize]
     public class Shopping_CartController : ControllerBase
     {
         private readonly UserManager<UsersEcommerce> _userManager;

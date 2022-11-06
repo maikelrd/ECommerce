@@ -2,6 +2,7 @@
 using ECommerce.Data;
 using ECommerce.Data.Entities;
 using ECommerce.Model;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
@@ -14,6 +15,7 @@ namespace ECommerce.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+//[Authorize]
     public class PaginationController : ControllerBase
     {
 
@@ -44,6 +46,7 @@ namespace ECommerce.Controllers
         }
 
         [HttpGet("{page}")]
+        [Authorize]
         public async Task<ActionResult<ProductModel[]>> Get(int page)
         {
             try

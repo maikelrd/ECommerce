@@ -21,8 +21,8 @@ namespace ECommerce.Data
         public DbSet<Image> Images { get; set; }
         public DbSet<Department> Departments { get; set; }
         public DbSet<Category> Categories { get; set; }
-        public DbSet<ShoppingCartItem> ShoppingCartItems { get; set; }
-        public DbSet<User> Users { get; set; }
+       // public DbSet<ShoppingCartItem> ShoppingCartItems { get; set; }
+      //  public DbSet<User> Users { get; set; }
 
         public DbSet<ShoppingCart> ShoppingCarts { get; set; }
         public DbSet<ProductShoppingCart> productsShoppingCarts { get; set; }
