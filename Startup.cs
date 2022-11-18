@@ -39,25 +39,51 @@ namespace ECommerce
             options.UseSqlServer(Configuration.GetConnectionString("ECommerce")));
             services.AddDbContext<UserDbContext>(options =>
                  options.UseSqlServer(Configuration.GetConnectionString("UsersConnection")));
-            services.AddIdentity<UsersEcommerce, IdentityRole>(opt => { }).AddEntityFrameworkStores<UserDbContext>();
+             services.AddIdentity<UsersEcommerce, IdentityRole>()
+    .AddEntityFrameworkStores<UserDbContext>()
+    .AddDefaultTokenProviders();
+            //services.AddIdentity<IdentityUser, IdentityRole>(opt => { }).AddEntityFrameworkStores<UserDbContext>();
             services.AddScoped<IAppRepository, AppRepository>();
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                     .AddJwtBearer(options =>
-                      {
-                          options.TokenValidationParameters = new TokenValidationParameters
-                          {
-                              ValidateIssuer = true,
-                              ValidateAudience = true,
-                              ValidateLifetime = true,
-                              ValidateIssuerSigningKey = true,
-                              ValidIssuer = Configuration["Jwt:Issuer"],
-                              ValidAudience = Configuration["Jwt:Audience"],
-                              IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"])),
-                              ClockSkew = TimeSpan.FromMinutes(Convert.ToInt32(Configuration["Jwt:minutestoexpiration"]))
-                          };
-                      });
+
+            // Adding Authentication
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+
+            // Adding Jwt Bearer
+            .AddJwtBearer(options =>
+            {
+                options.SaveToken = true;
+                options.RequireHttpsMetadata = false;
+                options.TokenValidationParameters = new TokenValidationParameters()
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidAudience = Configuration["JWT:ValidAudience"],
+                    ValidIssuer = Configuration["JWT:ValidIssuer"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JWT:Secret"]))
+                };
+            });
+            //services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            //         .AddJwtBearer(options =>
+            //          {
+            //              options.TokenValidationParameters = new TokenValidationParameters
+            //              {
+            //                  ValidateIssuer = true,
+            //                  ValidateAudience = true,
+            //                 // ValidateLifetime = true,
+            //                 // ValidateIssuerSigningKey = true,
+            //                  ValidIssuer = Configuration["Jwt:Issuer"],
+            //                  ValidAudience = Configuration["Jwt:Audience"],
+            //                  IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"])),
+            //                 // ClockSkew = TimeSpan.FromMinutes(Convert.ToInt32(Configuration["Jwt:minutestoexpiration"]))
+            //              };
+            //          });
 
             services.AddControllers().AddJsonOptions(options =>
             {
@@ -98,7 +124,8 @@ namespace ECommerce
             {
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "ECommerce v1"));
+                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "ECommerce v1"));
+                //app.UseSwaggerUI();
             }
 
             app.UseHttpsRedirection();

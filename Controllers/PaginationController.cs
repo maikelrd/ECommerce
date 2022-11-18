@@ -15,7 +15,7 @@ namespace ECommerce.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-//[Authorize]
+    [Authorize]
     public class PaginationController : ControllerBase
     {
 
@@ -46,7 +46,7 @@ namespace ECommerce.Controllers
         }
 
         [HttpGet("{page}")]
-        [Authorize]
+        //[Authorize]
         public async Task<ActionResult<ProductModel[]>> Get(int page)
         {
             try

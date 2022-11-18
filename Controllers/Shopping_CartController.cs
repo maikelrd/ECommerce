@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using ECommerce.Data;
 using ECommerce.Data.Entities;
+
 using ECommerce.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -23,7 +24,7 @@ namespace ECommerce.Controllers
         private readonly IAppRepository _repository;
         private readonly IMapper _mapper;
         private readonly LinkGenerator _linkGenerator;
-        public Shopping_CartController(UserManager<UsersEcommerce> userManager,IAppRepository repository, IMapper mapper, LinkGenerator linkGenerator)
+        public Shopping_CartController(UserManager<UsersEcommerce> userManager, IAppRepository repository, IMapper mapper, LinkGenerator linkGenerator)
         {
             _userManager = userManager;
             _repository = repository;
@@ -38,8 +39,9 @@ namespace ECommerce.Controllers
         {
             try
             {
-                
-                var user = await _repository.GetUserAspNetByEmailAsync(userEmail);
+
+                // var user = await _repository.GetUserAspNetByEmailAsync(userEmail);
+                var user = await _userManager.FindByEmailAsync(userEmail);
                 if (user == null)
                 {
                     return NotFound("Invalid user to return shopping cart");
@@ -88,7 +90,8 @@ namespace ECommerce.Controllers
             try
             {
                 // var user = await _repository.GetUserByEmailAsync(shopping_CartModel.UserEmail);
-                var user = await _repository.GetUserAspNetByEmailAsync(shopping_CartModel.UserEmail);
+                // var user = await _repository.GetUserAspNetByEmailAsync(shopping_CartModel.UserEmail);
+                var user = await _userManager.FindByEmailAsync(shopping_CartModel.UserEmail);
                 if (user == null)
                 {
                     return BadRequest($"Incorrect user email: {shopping_CartModel.UserEmail}");
@@ -181,7 +184,8 @@ namespace ECommerce.Controllers
             {
 
                 // var user = await _repository.GetUserByEmailAsync(userEmail);
-                var user = await _repository.GetUserAspNetByEmailAsync(userEmail);
+                // var user = await _repository.GetUserAspNetByEmailAsync(userEmail);
+                var user = await _userManager.FindByEmailAsync(userEmail);
                 if (user == null)
                 {
                     return NotFound($"Invalid user to  delete ShoppingCart para el userEmail: {userEmail}");

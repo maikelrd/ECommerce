@@ -19,7 +19,7 @@ namespace ECommerce.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+   // [Authorize]
     public class ProductsController : ControllerBase
     {
         CloudStorageAccount cloudStorageAccount =
@@ -72,7 +72,7 @@ namespace ECommerce.Controllers
         [Produces("application/json")]
         [HttpPost]
         [Consumes("multipart/form-data")]
-        // [Authorize]
+         [Authorize(Roles = UserRoles.Admin)]
         public async Task<ActionResult<ProductModel>> Post([FromForm] FileModel fileObj)
         {
             try

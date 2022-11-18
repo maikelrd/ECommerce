@@ -13,17 +13,22 @@ namespace ECommerce.Model
 
         public string Token { get; set; }
         public bool IsAuthenticated { get; set; }
-        
+        //this is added for the refresh token
+        public string RefreshToken { get; set; } = string.Empty;
+        //public DateTime RefreshTokenCreated { get; set; } = DateTime.Now;
+        //public DateTime RefreshTokenExpires { get; set; }
 
 
-        public UserDTO(string userName, string eMail)        {
+
+
+        //public UserDTO(string userName, string eMail)        {
          
             
-            UserName = userName;
-            Email = eMail;
-            IsAuthenticated = false;
+        //    UserName = userName;
+        //    Email = eMail;
+        //    IsAuthenticated = false;
 
 
-        }
+        //}
     }
 }

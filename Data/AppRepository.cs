@@ -12,14 +12,14 @@ namespace ECommerce.Data
 {
     public class AppRepository : IAppRepository
     {
-        private readonly UserManager<UsersEcommerce> _userManager;
-        private readonly SignInManager<UsersEcommerce> _signInManager;
+       // private readonly UserManager<IdentityUser> _userManager;
+     
         private readonly AppDbContext _context;
         private readonly ILogger<AppRepository> _logger;
-        public AppRepository(UserManager<UsersEcommerce> userManager, SignInManager<UsersEcommerce> signInManager, AppDbContext context, ILogger<AppRepository> logger)
+        public AppRepository( AppDbContext context, ILogger<AppRepository> logger)
         {
-            _userManager = userManager;
-            _signInManager = signInManager;
+            //_userManager = userManager;
+           
             _context = context;
             _logger = logger;
         }
@@ -267,12 +267,12 @@ namespace ECommerce.Data
         //    return await query.FirstOrDefaultAsync();
         //}
 
-        public async Task<UsersEcommerce> GetUserAspNetByIdAsync(string id)
-        {
-            _logger.LogInformation($"Getting a User for {id}");
-           var query = _userManager.FindByIdAsync(id);
-            return await query;
-        }
+        //public async Task<IdentityUser> GetUserAspNetByIdAsync(string id)
+        //{
+        //    _logger.LogInformation($"Getting a User for {id}");
+        //   var query = _userManager.FindByIdAsync(id);
+        //    return await query;
+        //}
 
         //erase below
         //public async Task<User> GetUserByNameAsync(string name)
@@ -282,12 +282,12 @@ namespace ECommerce.Data
         //    return await query.FirstOrDefaultAsync();
         //}
 
-        public async Task<UsersEcommerce> GetUserAspNetByNameAsync(string name)
-        {
-            _logger.LogInformation($"Getting a User for {name}");
-            var query = _userManager.FindByNameAsync(name); //_context.Users.Where(u => u.FirstName == name);
-            return  await query;
-        }
+        //public async Task<IdentityUser> GetUserAspNetByNameAsync(string name)
+        //{
+        //    _logger.LogInformation($"Getting a User for {name}");
+        //    var query = _userManager.FindByNameAsync(name); //_context.Users.Where(u => u.FirstName == name);
+        //    return  await query;
+        //}
 
         //public async Task<User> GetUserByEmailAsync(string email)
         //{
@@ -296,12 +296,12 @@ namespace ECommerce.Data
         //    return await query.FirstOrDefaultAsync();
         //}
 
-        public async Task<UsersEcommerce> GetUserAspNetByEmailAsync(string email)
-        {
-            _logger.LogInformation($"Getting a User for {email}");
-            var query = _userManager.FindByEmailAsync(email); //_context.Users.Where(u => u.Email == email);
-            return await query;
-        }
+        //public async Task<IdentityUser> GetUserAspNetByEmailAsync(string email)
+        //{
+        //    _logger.LogInformation($"Getting a User for {email}");
+        //    var query = _userManager.FindByEmailAsync(email); //_context.Users.Where(u => u.Email == email);
+        //    return await query;
+        //}
 
         //ShoppingCarts old
         //public async Task<ShoppingCartItem[]> GetAllCartsAsync()

@@ -1,4 +1,5 @@
 ﻿using ECommerce.Data.Entities;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
@@ -43,11 +44,11 @@ namespace ECommerce.Data
         //User
       //  Task<User[]> GetAllUserAsync();
        // Task<User> GetUserByIdAsync(int id);
-        Task<UsersEcommerce> GetUserAspNetByIdAsync(string id);
+       // Task<IdentityUser> GetUserAspNetByIdAsync(string id);
       //  Task<User> GetUserByNameAsync(string name);
-        Task<UsersEcommerce> GetUserAspNetByNameAsync(string name);
+       // Task<IdentityUser> GetUserAspNetByNameAsync(string name);
       //  Task<User> GetUserByEmailAsync(string email);
-        Task<UsersEcommerce> GetUserAspNetByEmailAsync(string email);
+       // Task<IdentityUser> GetUserAspNetByEmailAsync(string email);
 
         //ShoppingCart old
         ////Task<ShoppingCartItem[]> GetAllCartsAsync();        

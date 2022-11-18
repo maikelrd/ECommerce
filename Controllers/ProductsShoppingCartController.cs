@@ -3,6 +3,7 @@ using ECommerce.Data;
 using ECommerce.Data.Entities;
 using ECommerce.Model;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using System;
@@ -20,8 +21,10 @@ namespace ECommerce.Controllers
         private readonly IAppRepository _repository;
     private readonly IMapper _mapper;
     private readonly LinkGenerator _linkGenerator;
-        public ProductsShoppingCartController(IAppRepository repository, IMapper mapper, LinkGenerator linkGenerator)
+        private readonly UserManager<UsersEcommerce> _userManager;
+        public ProductsShoppingCartController(UserManager<UsersEcommerce> userManager, IAppRepository repository, IMapper mapper, LinkGenerator linkGenerator)
         {
+            _userManager = userManager;
             _repository = repository;
             _mapper = mapper;
             _linkGenerator = linkGenerator;
@@ -75,7 +78,8 @@ namespace ECommerce.Controllers
             try
             {
                 // var user = await _repository.GetUserByEmailAsync(userEmail);
-                var user = await _repository.GetUserAspNetByEmailAsync(userEmail);
+                // var user1 = await _repository.GetUserAspNetByEmailAsync(userEmail);
+                var user = await _userManager.FindByEmailAsync(userEmail);
                 if (user == null)
                 {
                     return NotFound("Invalid user to return shopping cart");
@@ -166,7 +170,8 @@ namespace ECommerce.Controllers
             {
 
                 //var user = await _repository.GetUserByEmailAsync(userEmail);
-                var user = await _repository.GetUserAspNetByEmailAsync(userEmail);
+               // var user = await _repository.GetUserAspNetByEmailAsync(userEmail);
+               var user = await _userManager.FindByEmailAsync(userEmail);
                 if (user == null)
                 {
                     return NotFound($"Invalid user to return delete ProductShoppingCart para el userEmail: {userEmail}");

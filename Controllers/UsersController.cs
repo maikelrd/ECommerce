@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using ECommerce.Data;
 using ECommerce.Data.Entities;
+
 using ECommerce.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -8,11 +9,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using NuGet.Packaging.Core;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -22,20 +25,24 @@ namespace ECommerce.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-        private readonly IConfiguration _configuration;
         private readonly UserManager<UsersEcommerce> _userManager;
-        private readonly SignInManager<UsersEcommerce> _signInManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly IConfiguration _configuration;
 
         //private readonly IAppRepository _repository;
         private readonly IMapper _mapper;
         private readonly LinkGenerator _linkGenerator;
         private readonly IAppRepository _repository;
 
-        public UsersController(IConfiguration configuration,UserManager<UsersEcommerce> userManager,SignInManager<UsersEcommerce> signInManager, IMapper mapper, LinkGenerator linkGenerator, IAppRepository repository)
+      //  UserDTO userDTO = new UserDTO();
+
+        public UsersController(UserManager<UsersEcommerce> userManager,
+            RoleManager<IdentityRole> roleManager,
+            IConfiguration configuration, IMapper mapper, LinkGenerator linkGenerator, IAppRepository repository)
         {
-            _configuration = configuration;
             _userManager = userManager;
-            _signInManager = signInManager;
+            _roleManager = roleManager;
+            _configuration = configuration;
             //_repository = repository;
             _mapper = mapper;
             _linkGenerator = linkGenerator;
@@ -43,203 +50,232 @@ namespace ECommerce.Controllers
         }
 
         [HttpPost("RegisterUser")]
-        public async Task<ActionResult<RegisterModel>> RegisterUser(UserModel userModel)
+        public async Task<IActionResult> Register([FromBody] RegisterModel model)
         {
-            try
-            {
-                //UserName must be equal to Email, o there will be an error
-                var user = new UsersEcommerce() { FirstName = userModel.FirstName, LastName = userModel.LastName,UserName= userModel.Email, Email = userModel.Email };
-                var result = await _userManager.CreateAsync(user, userModel.Password);
-                if (result.Succeeded)
-                {
-                    var appUser = await _userManager.FindByEmailAsync(userModel.Email);
-                    //var appuser1 = await _repository.GetUserAspNetByIdAsync(appUser.Id);
-                    var registerModel = new RegisterModel(appUser.FirstName, appUser.Email);
-                    return await Task.FromResult(registerModel);
-                }
+            var userExists = await _userManager.FindByEmailAsync(model.Email);
+            if (userExists != null)
+                return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "User already exists!" });
 
-                var error = string.Join(",", result.Errors.Select(x => x.Description).ToArray());
-                return BadRequest(error);
-            }
-            catch (Exception ex)
+            UsersEcommerce user = new()
             {
+                Email = model.Email,
+                SecurityStamp = Guid.NewGuid().ToString(),
+                UserName = model.FirstName,
+                FirstName = model.FirstName,
+                LastName = model.LastName
+            };
+            var result = await _userManager.CreateAsync(user, model.Password);
+            if (!result.Succeeded)
+                return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "User creation failed! Please check user details and try again." });
 
-                Console.WriteLine(ex);
-                return this.StatusCode(StatusCodes.Status500InternalServerError, "Database Failure");
-                
-            }
+            return Ok(new Response { Status = "Success", Message = "User created successfully!" });
         }
 
-        [HttpPost("Login")]
-        public async Task<ActionResult<UserDTO>> Login(LoginModel model)
+        [HttpPost]
+        [Route("register-admin")]
+        public async Task<IActionResult> RegisterAdmin([FromBody] RegisterModel model)
         {
-            try
+            var userExists = await _userManager.FindByEmailAsync(model.Email);
+            if (userExists != null)
+                return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "User already exists!" });
+
+            UsersEcommerce user = new()
             {
-                if (ModelState.IsValid)
+                Email = model.Email,
+                SecurityStamp = Guid.NewGuid().ToString(),
+                UserName = model.FirstName,
+                FirstName=model.FirstName,
+                LastName=model.LastName
+            };
+            var result = await _userManager.CreateAsync(user, model.Password);
+            if (!result.Succeeded)
+                return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "User creation failed! Please check user details and try again." });
+
+            if (!await _roleManager.RoleExistsAsync(UserRoles.Admin))
+                await _roleManager.CreateAsync(new IdentityRole(UserRoles.Admin));
+            if (!await _roleManager.RoleExistsAsync(UserRoles.User))
+                await _roleManager.CreateAsync(new IdentityRole(UserRoles.User));
+
+            if (await _roleManager.RoleExistsAsync(UserRoles.Admin))
+            {
+                await _userManager.AddToRoleAsync(user, UserRoles.Admin);
+            }
+            if (await _roleManager.RoleExistsAsync(UserRoles.Admin))
+            {
+                await _userManager.AddToRoleAsync(user, UserRoles.User);
+            }
+            return Ok(new Response { Status = "Success", Message = "User created successfully!" });
+        }
+        [HttpPost]
+        [Route("Login")]
+        public async Task<IActionResult> Login([FromBody] LoginModel model)
+        {
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))
+            {
+                var userRoles = await _userManager.GetRolesAsync(user);
+
+                var authClaims = new List<Claim>
                 {
-                    var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, false, false);
-                    if (result.Succeeded)
-                    {
-                        var appUser = await _userManager.FindByEmailAsync(model.Email);
-                        var user = new UserDTO(appUser.FirstName, appUser.Email);
-                        user.IsAuthenticated = true;
-                        user.Token = GenerateToken(appUser);
-                        return await Task.FromResult(user);
-                    }              
+                    new Claim(ClaimTypes.Name, user.UserName),
+                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                };
 
+                foreach (var userRole in userRoles)
+                {
+                    authClaims.Add(new Claim(ClaimTypes.Role, userRole));
                 }
-                return BadRequest("Invalid Email or password");
-            }
-            catch (Exception ex)
-            {
 
-                Console.WriteLine(ex);
-                return this.StatusCode(StatusCodes.Status500InternalServerError, "Database Failure");
+                var token = GetToken(authClaims);
+                // UserDTO userDTO = new UserDTO(user.UserName, user.Email);
+                UserDTO userDTO = new UserDTO();
+                userDTO.UserName = user.UserName;
+                userDTO.Email = user.Email;
+                userDTO.IsAuthenticated = true;
+                userDTO.Token = new JwtSecurityTokenHandler().WriteToken(token);
+
+                var refreshToken = GenerateRefreshToken();
+
+                user.RefreshToken = refreshToken.Token;
+                user.RefreshTokenCreated = refreshToken.Created;
+                user.RefreshTokenExpires = refreshToken.Expires;
+                await _userManager.UpdateAsync(user);
+                // SetRefreshToken(refreshToken);
+                userDTO.RefreshToken = refreshToken.Token;
+                  return Ok(userDTO);
+                //return Ok(new
+                //{
+                //    UserName = user.UserName,
+                //    Email = user.Email,
+                //    Token = new JwtSecurityTokenHandler().WriteToken(token),
+                //    IsAuthenticated = true
+                //    //expiration = token.ValidTo
+                //    //token = new JwtSecurityTokenHandler().WriteToken(token),
+                //    //expiration = token.ValidTo
+                //});
             }
+            return Unauthorized();
         }
 
-        private string GenerateToken(UsersEcommerce user)
+        private async Task<TokenResponse> Authenticate(string username, Claim[] claims)
         {
-            //var jwtTokenHandler = new JwtSecurityTokenHandler();
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
-            //Create satandard JWT claims
-            //var claims = new List<Claim>
-            //{
-            //    new Claim(ClaimTypes.Name, user.UserName),
-            //    new Claim(ClaimTypes.NameIdentifier, user.Id),
-            //    new Claim(JwtRegisteredClaimNames. Nbf, new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds().ToString()),
-            //    new Claim(JwtRegisteredClaimNames.Exp, new DateTimeOffset(DateTime.Now.AddDays(1)).ToUnixTimeSeconds().ToString())
-            //};
-            //Create the JwtSecurityToken object
-            //var token = new JwtSecurityToken(
-            //    new JwtHeader(
-            //        new SigningCredentials(key, SecurityAlgorithms.HmacSha256)),
-            //    new JwtPayload(claims));
+            TokenResponse tokenResponse = new TokenResponse();
+            var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
+
             var token = new JwtSecurityToken(
-                issuer: _configuration["Jwt:Issuer"],
-                audience: _configuration["Jwt:Audience"],
-                 expires: DateTime.Now.AddMinutes(60),
-                 signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256));
+                issuer: _configuration["JWT:ValidIssuer"],
+                audience: _configuration["JWT:ValidAudience"],
+                expires: DateTime.Now.AddMinutes(2),
+                claims: claims,
+                signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
+                );
+            tokenResponse.Token = new JwtSecurityTokenHandler().WriteToken(token);
 
-            //Create a string representation of the Jwt token
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            // tokenResponse.RefreshToken = GenerateRefreshToken().Token;
+            var response = GenerateRefreshToken();
+            tokenResponse.RefreshToken =response.Token;
+            var user = await _userManager.FindByNameAsync(username);
+            user.RefreshToken = response.Token;
+            user.RefreshTokenCreated = response.Created;
+            user.RefreshTokenExpires = response.Expires;
+            await _userManager.UpdateAsync(user);
+
+            return tokenResponse;
         }
-        //private string GenerateToken(UsersEcommerce user)
-        //{
-        //    var jwtTokenHandler = new JwtSecurityTokenHandler();
-        //    var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
-        //    var tokenDescriptor = new SecurityTokenDescriptor
-        //    {
-        //        Subject = new System.Security.Claims.ClaimsIdentity(new[]
-        //        {
-        //            new System.Security.Claims.Claim(JwtRegisteredClaimNames.NameId,user.Id),
-        //            new System.Security.Claims.Claim(JwtRegisteredClaimNames.Email,user.Email),
-        //            new System.Security.Claims.Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString()),
-        //        }),
-        //        Expires = DateTime.UtcNow.AddHours(12),
-        //        SigningCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature),
-        //        Audience = _configuration["Jwt:Audience"],
-        //        Issuer = _configuration["Jwt:Issuer"]
-        //    };
-        //    var token = jwtTokenHandler.CreateToken(tokenDescriptor);
-        //    return jwtTokenHandler.WriteToken(token);
 
+        [HttpPost]
+        [Route("RefreshToken")]
+        public async Task<IActionResult> RefreshToken([FromBody] TokenResponse token)
+        {
+            try
+            {
+                //if (token.Token == "")
+                //{
+                //    return Unauthorized();
+                //}
+                var tokenhandler = new JwtSecurityTokenHandler();
+                SecurityToken securityToken;
+                var principal = tokenhandler.ValidateToken(token.Token, new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidAudience = _configuration["JWT:ValidAudience"],
+                    ValidIssuer = _configuration["JWT:ValidIssuer"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]))
+                }, out securityToken);
+                var _token = securityToken as JwtSecurityToken;
+                if (_token == null || !_token.Header.Alg.Equals(SecurityAlgorithms.HmacSha256))
+                {
+                    return Unauthorized();
+                }
+                var username = principal.Identity.Name;
+                var user = await _userManager.FindByNameAsync(username);
+                if (user == null)
+                {
+                    return Unauthorized();
+                }
+                if (user.RefreshToken != token.RefreshToken)
+                {
+                    return Unauthorized();
+                }
+                TokenResponse _result = await Authenticate(username, principal.Claims.ToArray());
+                return Ok(_result);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return this.StatusCode(StatusCodes.Status500InternalServerError, " Invalid JWT");
+            }
+        }
+        private RefreshToken GenerateRefreshToken()
+        {
+            var refreshToken = new RefreshToken
+            {
+                Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
+                Expires = DateTime.Now.AddMinutes(1),
+                Created = DateTime.Now
+            };
+
+            return refreshToken;
+        }
+
+        //private RefreshToken GenerateRefreshToken()
+        //{
+        //    var refreshToken = new RefreshToken
+        //    {
+        //        Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
+        //        Expires = DateTime.UtcNow.AddDays(7),
+        //        Created = DateTime.UtcNow
+        //    };
+        //    return refreshToken;
         //}
 
-        //    [HttpGet]
-        //    public async Task<ActionResult<UserModel[]>> Get()
+        //private void SetRefreshToken(RefreshToken newRefreshToken)
+        //{
+        //    var cookieOptions = new CookieOptions
         //    {
-        //        try
-        //        {
-        //            var results = await _repository.GetAllUserAsync();
-        //            return _mapper.Map<UserModel[]>(results);
-        //        }
-        //        catch (Exception)
-        //        {
+        //        HttpOnly = true,
+        //        Expires = newRefreshToken.Expires
+        //    };
+        //    Response.Cookies.Append("refreshToken", newRefreshToken.Token, cookieOptions);
+        //   // userDTO.RefreshToken = newRefreshToken.Token;
+        //   // userDTO.RefreshTokenCreated = newRefreshToken.Created;
+        //    //userDTO.RefreshTokenExpires = newRefreshToken.Expires;
+        //}
+        private JwtSecurityToken GetToken(List<Claim> authClaims)
+        {
+            var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
 
-        //            return this.StatusCode(StatusCodes.Status500InternalServerError, "Database Failure");
-        //        }
-        //    }
+            var token = new JwtSecurityToken(
+                issuer: _configuration["JWT:ValidIssuer"],
+                audience: _configuration["JWT:ValidAudience"],
+                expires: DateTime.Now.AddMinutes(2),
+                claims: authClaims,
+                signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
+                );
 
-        //    [HttpGet("{id:int}")]
-        //    public async Task<ActionResult<UserModel>> Get(int id)
-        //    {
-        //        try
-        //        {
-        //            var result = await _repository.GetUserByIdAsync(id);
-        //            if (result == null)
-        //            {
-        //                return NotFound($"Could not find User with id {id}");
-        //            }
-        //            return _mapper.Map<UserModel>(result);
-        //        }
-        //        catch (Exception)
-        //        {
-
-        //            return this.StatusCode(StatusCodes.Status500InternalServerError, "Database Failure");
-        //        }
-        //    }
-
-
-
-        //    [HttpPost("RegisterUser")]
-        //    public async Task<ActionResult<RegisterModel>> Post(UserModel model)
-        //    {
-        //        try
-        //        {
-        //            var existing = await _repository.GetUserByEmailAsync(model.Email);
-        //            if (existing != null)
-        //            {
-        //                return BadRequest("Email in use");
-        //            }
-
-        //            var user = _mapper.Map<User>(model);
-        //            _repository.Add(user);
-
-        //            if (await _repository.SaveChangesAsync())
-        //            {
-        //                var location = _linkGenerator.GetPathByAction("Get", "Users",
-        //                                                    new { id = user.UserId });
-        //                if (string.IsNullOrWhiteSpace(location))
-        //                {
-        //                    return BadRequest("Could not use current UserId");
-        //                }
-        //                //Here i put registerModel, because if return a UserModel, then send back the password to the backend.
-        //                return Created(location, _mapper.Map<RegisterModel>(user));
-        //            }
-
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            Console.WriteLine(ex);
-        //            return this.StatusCode(StatusCodes.Status500InternalServerError, "Database Failure");
-        //        }
-        //        return BadRequest();
-        //    }
-
-        //    [HttpPut("{id}")]
-        //    public async Task<ActionResult<UserModel>> Put(int id, UserModel model)
-        //    {
-        //        try
-        //        {
-        //            var oldUser = await _repository.GetUserByIdAsync(id);
-        //            if (oldUser == null)
-        //            {
-        //                return NotFound($"Could not find user with id {id}");
-        //            }
-
-        //            _mapper.Map(model, oldUser);
-        //            if (await _repository.SaveChangesAsync())
-        //            {
-        //                return _mapper.Map<UserModel>(oldUser);
-        //            }
-        //        }
-        //        catch (Exception)
-        //        {
-
-        //            return this.StatusCode(StatusCodes.Status500InternalServerError, "Database Failure");
-        //        }
-        //        return BadRequest();
-        //    }
+            return token;
+        }
+        
     }
 }
