@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace ECommerce.Migrations
+namespace ECommerce.Migrations.UserDb
 {
-    public partial class userEcommerce : Migration
+    public partial class inital : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -33,6 +33,10 @@ namespace ECommerce.Migrations
                     RefreshToken = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     RefreshTokenCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
                     RefreshTokenExpires = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Street = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    City = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    State = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ZipCode = table.Column<int>(type: "int", nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),

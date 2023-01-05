@@ -449,7 +449,29 @@ namespace ECommerce.Data
             _context.RemoveRange(productShoppingCartItems);
             // _context.SaveChanges();
 
-        }      
+        }
+
+        //Cards
+        public async Task<Card[]> GetCardsByUserAsync(string Email)
+        {
+            _logger.LogInformation($"Getting a Card for user:  {Email}");
+            IQueryable<Card> query = _context.Cards.Where(c => c.Email == Email);
+            return await query.ToArrayAsync();
+        }
+
+        public async Task<Card> GetCardByCardNumberAsync(string Email, string CardNumber)
+        {
+            _logger.LogInformation($"Getting a Card for CardNumber:  {CardNumber}");
+            IQueryable<Card> query = _context.Cards.Where(c => c.CardNumber == CardNumber && c.Email == Email);
+            return await query.FirstOrDefaultAsync();
+        }
+
+        public async Task<Card> GetCardByIdAsync(int CardId)
+        {
+            _logger.LogInformation($"Getting a Card for CardId:  {CardId}");
+            IQueryable<Card> query = _context.Cards.Where(c => c.CardId == CardId);
+            return await query.FirstOrDefaultAsync();
+        }
 
     }
 }

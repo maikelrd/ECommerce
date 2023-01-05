@@ -26,6 +26,7 @@ namespace ECommerce.Data
 
         public DbSet<ShoppingCart> ShoppingCarts { get; set; }
         public DbSet<ProductShoppingCart> productsShoppingCarts { get; set; }
+        public DbSet<Card> Cards { get; set; }
 
     //    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     //    {

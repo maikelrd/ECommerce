@@ -13,5 +13,9 @@ namespace ECommerce.Data.Entities
         public string RefreshToken { get; set; }
         public DateTime RefreshTokenCreated { get; set; } 
         public DateTime RefreshTokenExpires { get; set; }
+        public string Street { get; set; }
+        public string City { get; set; }
+        public string State { get; set; }
+        public int ZipCode { get; set; }
     }
 }

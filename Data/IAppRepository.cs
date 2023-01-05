@@ -78,5 +78,10 @@ namespace ECommerce.Data
         Task<ProductShoppingCart> GetProductShoppingCartByProductShoppingCartIdAsyn(int productShoppingCartId);
         void ClearProductShoppingCartCart(int shoppingCartId);
 
+        //Cards
+        Task<Card[]> GetCardsByUserAsync(string Email);
+        Task<Card> GetCardByCardNumberAsync(string Email, string CardNumber);
+        Task<Card> GetCardByIdAsync(int CardId);
+
     }
 }

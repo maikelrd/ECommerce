@@ -25,6 +25,7 @@ namespace ECommerce.Data
             CreateMap<ShoppingCartItem, ShoppingCartModel>().ReverseMap();
             CreateMap<Shopping_Cart, Shopping_CartModel>().ReverseMap();
             CreateMap<ProductShoppingCart, ProductShoppingCartModel>().ReverseMap();
+            CreateMap<Card, CardModel>().ReverseMap();
         }
     }    
 }

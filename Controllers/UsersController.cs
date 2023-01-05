@@ -49,6 +49,37 @@ namespace ECommerce.Controllers
             _repository = repository;
         }
 
+        [HttpGet("Email")]
+        public async Task<IActionResult> Get(string Email)
+        {
+            var user = await _userManager.FindByEmailAsync(Email);
+            if (user == null)
+            {
+                return BadRequest("User not exist");
+            }
+            Address address = new ()
+            {
+                Street = user.Street,
+                City = user.City,
+                State = user.State,
+                ZipCode = user.ZipCode
+            };
+            address.Email = Email;
+            if (address.Street == null)
+            {
+                address.Street = "";
+            }
+            if (address.City == null)
+            {
+                address.City = "";
+            }
+            if (address.State == null)
+            {
+                address.State = "";
+            }
+            return Ok(address);
+        }
+
         [HttpPost("RegisterUser")]
         public async Task<IActionResult> Register([FromBody] RegisterModel model)
         {
@@ -105,6 +136,29 @@ namespace ECommerce.Controllers
                 await _userManager.AddToRoleAsync(user, UserRoles.User);
             }
             return Ok(new Response { Status = "Success", Message = "User created successfully!" });
+        }
+
+        [HttpPost]
+        [Route("Address")]
+        public async Task<IActionResult> Address([FromBody] Address model)
+        {
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null)
+            {
+                return BadRequest("User not exist");
+            }
+
+            user.Street = model.Street;
+            user.City = model.City;
+            user.State = model.State;
+            user.ZipCode = model.ZipCode;
+            await _userManager.UpdateAsync(user);
+            var user1 = await _userManager.FindByEmailAsync(model.Email);
+            model.Email = user1.Email;
+            model.Street = user1.Street;
+            model.State = user1.State;
+            model.ZipCode = user1.ZipCode;
+            return Ok(model);
         }
         [HttpPost]
         [Route("Login")]
@@ -165,7 +219,7 @@ namespace ECommerce.Controllers
             var token = new JwtSecurityToken(
                 issuer: _configuration["JWT:ValidIssuer"],
                 audience: _configuration["JWT:ValidAudience"],
-                expires: DateTime.Now.AddMinutes(2),
+                expires: DateTime.Now.AddMinutes(200),
                 claims: claims,
                 signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
                 );
@@ -232,7 +286,7 @@ namespace ECommerce.Controllers
             var refreshToken = new RefreshToken
             {
                 Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
-                Expires = DateTime.Now.AddMinutes(1),
+                Expires = DateTime.Now.AddMinutes(100),
                 Created = DateTime.Now
             };
 
@@ -269,13 +323,15 @@ namespace ECommerce.Controllers
             var token = new JwtSecurityToken(
                 issuer: _configuration["JWT:ValidIssuer"],
                 audience: _configuration["JWT:ValidAudience"],
-                expires: DateTime.Now.AddMinutes(2),
+                expires: DateTime.Now.AddMinutes(200),
                 claims: authClaims,
                 signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
                 );
 
             return token;
         }
+
+       
         
     }
 }
