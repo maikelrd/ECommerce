@@ -72,7 +72,7 @@ namespace ECommerce.Controllers
         [Produces("application/json")]
         [HttpPost]
         [Consumes("multipart/form-data")]
-         [Authorize(Roles = UserRoles.Admin)]
+        [Authorize(Roles = UserRoles.Admin)]
         public async Task<ActionResult<ProductModel>> Post([FromForm] FileModel fileObj)
         {
             try
