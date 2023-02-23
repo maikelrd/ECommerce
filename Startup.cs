@@ -36,9 +36,9 @@ namespace ECommerce
         public void ConfigureServices(IServiceCollection services)
         {          
             services.AddDbContext<AppDbContext>(options =>
-            options.UseSqlServer(Configuration.GetConnectionString("ECommerce")));
+            options.UseSqlServer(Configuration.GetConnectionString("ProdECommerce")));
             services.AddDbContext<UserDbContext>(options =>
-                 options.UseSqlServer(Configuration.GetConnectionString("UsersConnection")));
+                 options.UseSqlServer(Configuration.GetConnectionString("ProdUsersConnection")));
              services.AddIdentity<UsersEcommerce, IdentityRole>()
     .AddEntityFrameworkStores<UserDbContext>()
     .AddDefaultTokenProviders();

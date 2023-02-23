@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ECommerce.Migrations.UserDb
 {
     [DbContext(typeof(UserDbContext))]
-    [Migration("20221230031241_inital")]
-    partial class inital
+    [Migration("20230205024934_second")]
+    partial class second
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
