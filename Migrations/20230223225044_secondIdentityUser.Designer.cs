@@ -9,11 +9,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace ECommerce.Migrations.UserDb
+namespace ECommerce.Migrations
 {
     [DbContext(typeof(UserDbContext))]
-    [Migration("20230205024934_second")]
-    partial class second
+    [Migration("20230223225044_secondIdentityUser")]
+    partial class secondIdentityUser
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -100,8 +100,8 @@ namespace ECommerce.Migrations.UserDb
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
-                    b.Property<int>("ZipCode")
-                        .HasColumnType("int");
+                    b.Property<string>("ZipCode")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 

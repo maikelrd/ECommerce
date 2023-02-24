@@ -77,6 +77,10 @@ namespace ECommerce.Controllers
             {
                 address.State = "";
             }
+            if (address.ZipCode == null)
+            {
+                address.ZipCode = "";
+            }
             return Ok(address);
         }
 
