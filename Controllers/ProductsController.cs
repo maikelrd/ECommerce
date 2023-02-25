@@ -82,7 +82,7 @@ namespace ECommerce.Controllers
                 var existing = await _repository.GetProductByName(productModel.ProductName);
                 if (existing != null)
                 {
-                    return BadRequest("Name is in use");
+                    return BadRequest("Name is in use")
                 }
 
                 var product = _mapper.Map<Product>(productModel);
